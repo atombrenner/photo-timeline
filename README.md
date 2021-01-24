@@ -1,6 +1,16 @@
-# New Project
+# photo-timeline
 
 > ✨ Bootstrapped with Create Snowpack App (CSA).
+
+Organize your photos by time and display them in a simple and fast web app everywhere.
+
+year/month/day-number
+
+```
+└── 2019
+    ├── 10-Oktober
+    │   ├── 2019-10-20 001.jpg
+```
 
 ## Available Scripts
 
@@ -21,7 +31,3 @@ See the section about running tests for more information.
 
 Builds the app for production to the `build/` folder.
 It correctly bundles Preact in production mode and optimizes the build for the best performance.
-
-### Q: What about Eject?
-
-No eject needed! Snowpack guarantees zero lock-in, and CSA strives for the same.

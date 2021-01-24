@@ -5,10 +5,12 @@
     "build": "snowpack build",
     "test": "web-test-runner \"src/**/*.test.tsx\"",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
-    "lint": "prettier --check \"src/**/*.{js,jsx}\""
+    "lint": "prettier --check \"src/**/*.{js,jsx}\"",
+    "import": "ts-node -P scripts/tsconfig.json scripts/import"
   },
   "dependencies": {
-    "preact": "^10.0.0"
+    "preact": "^10.0.0",
+    "tailwindcss": "^2.0.2"
   },
   "devDependencies": {
     "@prefresh/snowpack": "^3.0.0",
