@@ -1,7 +1,6 @@
 import { h } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
 import { images } from './image-data'
-import logo from './logo.png'
 import './App.css'
 import { assert } from 'chai'
 
@@ -29,10 +28,11 @@ function App() {
   }
 
   return (
-    <div tabIndex={-1} className="App" onKeyDown={handleKeyDown}>
-      <header className="App-header">
-        <img src={images[imageIndex]} />
-      </header>
+    <div tabIndex={-1} className="App" onKeyDown={handleKeyDown} class="App-container">
+      <div class="zoom">
+        <img class="image" src={images[imageIndex]} />
+      </div>
+      {/* <img class="image" src={images[imageIndex]} /> */}
     </div>
   )
 }
