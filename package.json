@@ -1,5 +1,7 @@
 {
-  "module": "",
+  "name": "photo-timeline",
+  "repository": "",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build",
