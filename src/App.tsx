@@ -17,36 +17,45 @@ function App() {
   const next = stepImage(current, 1, images.length)
   const prev = stepImage(current, -1, images.length)
 
+  const [inTransition, setInTransition] = useState(false)
+
   const ref = createRef()
   useEffect(() => ref.current.focus())
-
-  const ref1 = useRef<HTMLDivElement>()
-  const ref2 = useRef<HTMLDivElement>()
 
   const handleKeyDown = (e: KeyboardEvent) => {
     switch (e.code) {
       case 'ArrowRight':
-        setCurrent(next)
+        if (!inTransition) setCurrent(next)
         break
       case 'ArrowLeft':
-        setCurrent(prev)
+        if (!inTransition) setCurrent(prev)
         break
       default:
         return
     }
-    console.log('Event', e)
+    // for all handled keys
+    setInTransition(true)
     e.preventDefault()
   }
 
   return (
-    <div ref={ref} tabIndex={-1} className="App" onKeyDown={handleKeyDown} class="App-container">
-      <div key={prev} ref={ref1} class="photo photo-prev">
+    <div
+      ref={ref}
+      tabIndex={-1}
+      class="App App-container"
+      onKeyDown={handleKeyDown}
+      onTransitionEnd={(e) => {
+        console.log('endtrans', e)
+        setInTransition(false)
+      }}
+    >
+      <div key={prev} class="photo photo-prev">
         <img class="photo-image" src={images[prev]} />
       </div>
-      <div key={current} ref={ref1} class="photo photo-current">
+      <div key={current} class="photo photo-current">
         <img class="photo-image" src={images[current]} />
       </div>
-      <div key={next} ref={ref2} class="photo photo-next">
+      <div key={next} class="photo photo-next">
         <img class="photo-image" src={images[next]} />
       </div>
     </div>
