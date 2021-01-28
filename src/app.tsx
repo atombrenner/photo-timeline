@@ -1,7 +1,7 @@
-import { h, createRef } from 'preact'
+import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
 import { images } from './image-data'
-import './App.css'
+import './app.css'
 import { assert } from 'chai'
 
 function stepImage(index: number, step: number, count: number) {
@@ -19,7 +19,7 @@ function App() {
 
   const [inTransition, setInTransition] = useState(false)
 
-  const ref = createRef()
+  const ref = useRef<HTMLDivElement>()
   useEffect(() => ref.current.focus())
 
   const handleKeyDown = (e: KeyboardEvent) => {
