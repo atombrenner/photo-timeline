@@ -16,6 +16,7 @@ export function App() {
   const next = stepImage(current, 1, images.length)
   const prev = stepImage(current, -1, images.length)
 
+  // a little bit fishy, ignore keyboard events during transitions of photos
   const [inTransition, setInTransition] = useState(false)
 
   const ref = useRef<HTMLDivElement>()
@@ -23,7 +24,7 @@ export function App() {
 
   const handleKeyDown = (e: KeyboardEvent) => {
     switch (e.code) {
-      case ' ':
+      case 'Space':
       case 'ArrowRight':
         if (!inTransition) setCurrent(next)
         break
@@ -33,8 +34,7 @@ export function App() {
       default:
         return
     }
-    // for all handled keys
-    setInTransition(true)
+    setInTransition(true) // fishy
     e.preventDefault()
   }
 
@@ -44,10 +44,7 @@ export function App() {
       tabIndex={-1}
       class="App App-container"
       onKeyDown={handleKeyDown}
-      onTransitionEnd={(e) => {
-        console.log('endtrans', e)
-        setInTransition(false)
-      }}
+      onTransitionEnd={() => setInTransition(false)} // fishy: any end transition event will reset the state
     >
       <Photo key={prev} src={images[prev]} order="prev" />
       <Photo key={current} src={images[current]} order="current" />
