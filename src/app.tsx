@@ -2,17 +2,16 @@ import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
 import { images } from './image-data'
 import './app.css'
-import { assert } from 'chai'
+import { Photo } from './photo'
 
 function stepImage(index: number, step: number, count: number) {
-  assert(step < count)
   return (index + step + count) % count
 }
 
 // const next = (index: number) => stepImage(index, 1, images.length)
 // const prev = (index: number) => stepImage(index, -1, images.length)
 
-function App() {
+export function App() {
   const [current, setCurrent] = useState(0)
   const next = stepImage(current, 1, images.length)
   const prev = stepImage(current, -1, images.length)
@@ -24,6 +23,7 @@ function App() {
 
   const handleKeyDown = (e: KeyboardEvent) => {
     switch (e.code) {
+      case ' ':
       case 'ArrowRight':
         if (!inTransition) setCurrent(next)
         break
@@ -49,17 +49,9 @@ function App() {
         setInTransition(false)
       }}
     >
-      <div key={prev} class="photo photo-prev">
-        <img class="photo-image" src={images[prev]} />
-      </div>
-      <div key={current} class="photo photo-current">
-        <img class="photo-image" src={images[current]} />
-      </div>
-      <div key={next} class="photo photo-next">
-        <img class="photo-image" src={images[next]} />
-      </div>
+      <Photo key={prev} src={images[prev]} order="prev" />
+      <Photo key={current} src={images[current]} order="current" />
+      <Photo key={next} src={images[next]} order="next" />
     </div>
   )
 }
-
-export default App

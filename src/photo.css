@@ -1,0 +1,61 @@
+.App {
+  text-align: center;
+}
+.App code {
+  background: #fff3;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.App p {
+  margin: 0.4rem;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.App-container {
+  background-color: #282c34;
+
+  height: 100%;
+  display: block;
+
+  font-size: calc(10px + 2vmin);
+  color: white;
+
+  width: 100%;
+  overflow: hidden;
+}
+
+.photo {
+  position: absolute; /* disable flow, alternative idea: */
+
+  height: 100%;
+  display: flex; /* just to center vertical */
+
+  margin: auto;
+  width: 100%;
+
+  transition-property: transform;
+  transition-duration: 0.25s;
+  transition-timing-function: ease-in-out;
+}
+
+.photo-prev {
+  transform: translateX(-100vw);
+}
+
+.photo-current {
+  transform: translateX(0);
+}
+
+.photo-next {
+  transform: translateX(100vw);
+}
+
+.photo-image {
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto; /* center horizontal */
+  overflow: hidden;
+}
