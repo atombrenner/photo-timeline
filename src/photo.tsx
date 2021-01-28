@@ -9,7 +9,7 @@ export type PhotoProps = Readonly<{
 export function Photo({ src, order }: PhotoProps) {
   return (
     <div class={`photo photo-${order}`}>
-      <img class="photo-image" src={src} />
+      <img class="photo-image" src={src} alt="photo" />
     </div>
   )
 }
