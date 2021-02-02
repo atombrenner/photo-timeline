@@ -3,10 +3,6 @@ import { join } from 'path'
 import sharp from 'sharp'
 import parseExif, { Exif } from 'exif-reader'
 
-const path = '/home/christian/Photos/2003-06-29-003.jpg'
-//const path = '/home/christian/Photos/20190806_140412.jpg'
-//const path = '/home/christian/Photos/2019/01-Januar/2019-01-08 001.jpg'
-
 // read dir
 // readdir('/home/christian/Photos/2002', { withFileTypes: true })
 //   .then((entries) => entries.map((e) => (e.isDirectory() ? `dir: ${e.name}` : 'other')))
@@ -32,7 +28,11 @@ async function getImageCreationDate(file: string): Promise<number> {
 
 type MediaFile = {
   created: number // Date
-  file: string
+  path: string
+}
+
+type MovedMediaFile = MediaFile & {
+  desiredPath: string
 }
 
 async function readFolder(folder: string, pattern = /\.(jpg|jpeg)$/): Promise<string[]> {
@@ -50,13 +50,37 @@ async function readFolder(folder: string, pattern = /\.(jpg|jpeg)$/): Promise<st
   return [...files, ...moreFiles.flat()]
 }
 
-async function makeMediaFile(file: string): Promise<MediaFile> {
-  return getImageCreationDate(file).then((created) => ({ created, file }))
+async function makeMediaFile(path: string): Promise<MediaFile> {
+  return getImageCreationDate(path).then((created) => ({ created, path }))
 }
 
 readFolder('/home/christian/Photos/')
   .then((files) => Promise.all(files.map(makeMediaFile)))
   .then(console.log)
+
+function buildDesiredPath(folder: string, creationDate: number, index: number) {
+  return ''
+}
+
+function merge(folder: string, existingFiles: MediaFile[], newFiles: MediaFile[]): MoveMediaFile[] {
+  const byCreationDate = (a: MediaFile, b: MediaFile) => a.created - b.created
+  const toDesiredPath = (f: MediaFile, i: number) => ({
+    ...f,
+    desiredPath: buildDesiredPath(folder, f.created, i),
+  })
+  return [...existingFiles, ...newFiles].sort(byCreationDate).map(toDesiredPath)
+}
+
+//   const moveOrder = []
+//   // alternating go forward and backward through the files
+//   // and push files that will not overwrite to the moveOrder
+//   files.forEach((file) => {
+//     if (!filesContainPath(file.desiredPath)) {
+//       moveOrder.push(file)
+//       files.remove(file)
+//     }
+//   })
+// }
 
 function importPhotos() {
   // const src = readFolder('DCIM')
