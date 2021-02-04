@@ -1,78 +1,29 @@
-import { readFolder, getImageCreationDate } from './read'
-import { makeFileName, makeFolderName } from './names'
 import { join } from 'path'
-import { mv } from 'fs-extra'
-
-type MediaFile = {
-  created: number // Date
-  path: string
-}
-
-type DesiredFile = MediaFile & {
-  desiredPath: string
-}
-
-//
-function merge(
-  newFiles: MediaFile[],
-  existingFiles: MediaFile[],
-  folder: string,
-  type: string,
-): DesiredFile[] {
-  const byCreationDate = (a: MediaFile, b: MediaFile) => a.created - b.created
-  const makeDesiredFile = (f: MediaFile, i: number) => ({
-    ...f,
-    desiredPath: join(folder, makeFileName(f.created, i, type)),
-  })
-  return [...existingFiles, ...newFiles].sort(byCreationDate).map(makeDesiredFile)
-}
-
-//   const moveOrder = []
-//   // alternating go forward and backward through the files
-//   // and push files that will not overwrite to the moveOrder
-//   files.forEach((file) => {
-//     if (!filesContainPath(file.desiredPath)) {
-//       moveOrder.push(file)
-//       files.remove(file)
-//     }
-//   })
-// }
-
-async function readMediaFiles(folder: string): Promise<MediaFile[]> {
-  const makeMediaFile = (path: string) =>
-    getImageCreationDate(path).then((created) => ({ created, path }))
-  return readFolder(folder).then((files) => Promise.all(files.map(makeMediaFile)))
-}
-
-function groupByFolder(files: MediaFile[]): Record<string, MediaFile[]> {
-  const grouped: Record<string, MediaFile[]> = {}
-  for (const file of files) {
-    const folder = makeFolderName(file.created)
-    const group = grouped[folder] ?? []
-    if (group.length === 0) grouped[folder] = group
-    group.push(file)
-  }
-  return grouped
-}
-
-function orderMoveCommands(files: DesiredFile[]) {
-  return files
-}
+import { move, mkdirp } from 'fs-extra'
+import { readMediaFiles, calcMoveCommands, groupByFolder, organizeFolder } from './organize'
 
 async function importPhotos() {
   const type = 'jpg'
-  const photoPath = `/home/christian/Photos`
+  const rootFolder = `/home/christian/Photos`
   const newFiles = await readMediaFiles('/home/christian/DCIM')
   const folders = groupByFolder(newFiles)
-  for (const [folder, files] of Object.entries(folders)) {
-    const folderPath = join(photoPath, folder)
-    const existingFiles = await readMediaFiles(folderPath)
-    const desiredFiles = merge(files, existingFiles, folderPath, type)
-    // TODO: create index.json
-    for (const file of orderMoveCommands(desiredFiles)) {
-      //  mv(file.path -> file.desiredPath)
-    }
-  }
+
+  //const organizeFolder = async(folder: string, files: )
+
+  await Promise.all(
+    Object.entries(folders).map(async ([folder, files]) => {
+      const folderPath = join(rootFolder, folder)
+      // TODO: mkdirs(folderPath) if folder does not exist, create it
+      const existingFiles = await readMediaFiles(folderPath)
+      // TODO: validate that all existing files have the same folder
+      const filesInFolder = organizeFolder(files, existingFiles, type)
+
+      // TODO: (over)writeJson(join(folderPath, 'index.json'))
+      for (const { from, to } of calcMoveCommands(filesInFolder, rootFolder)) {
+        await move(from, to)
+      }
+    }),
+  )
 
   return Object.keys(folders)
 }

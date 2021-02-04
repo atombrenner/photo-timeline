@@ -2,6 +2,14 @@ import { readdir } from 'fs-extra'
 import { join } from 'path'
 import sharp from 'sharp'
 import parseExif, { Exif } from 'exif-reader'
+import { makeFileName, makeFolderName } from './names'
+
+export type MediaFile = {
+  path: string
+  created: number // Date
+  folder: string
+  file: string
+}
 
 export async function readFolder(folder: string, pattern = /\.(jpg|jpeg)$/i): Promise<string[]> {
   const entries = await readdir(folder, { withFileTypes: true })
