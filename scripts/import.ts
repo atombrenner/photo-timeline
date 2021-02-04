@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { move, mkdirp } from 'fs-extra'
+import { move, mkdirs } from 'fs-extra'
 import { readMediaFiles, calcMoveCommands, groupByFolder, organizeFolder } from './organize'
 
 async function importPhotos() {
@@ -13,14 +13,12 @@ async function importPhotos() {
   await Promise.all(
     Object.entries(folders).map(async ([folder, files]) => {
       const folderPath = join(rootFolder, folder)
-      // TODO: mkdirs(folderPath) if folder does not exist, create it
+      await mkdirs(folderPath) // if folder does not exist, create it
       const existingFiles = await readMediaFiles(folderPath)
-      // TODO: validate that all existing files have the same folder
       const filesInFolder = organizeFolder(files, existingFiles, type)
-
       // TODO: (over)writeJson(join(folderPath, 'index.json'))
       for (const { from, to } of calcMoveCommands(filesInFolder, rootFolder)) {
-        await move(from, to)
+        //await move(from, to)
       }
     }),
   )

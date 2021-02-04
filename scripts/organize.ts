@@ -1,7 +1,6 @@
 import { makeFileName, makeFolderName } from './names'
 import { join } from 'path'
-import { DesiredMediaFile, MediaFile } from './media-file'
-import { appendFileSync } from 'fs-extra'
+import { MediaFile } from './media-file'
 import { getImageCreationDate, readFolder } from './read'
 
 export interface ReadCreatedFn {
@@ -30,33 +29,47 @@ export async function groupByFolder<T extends { folder: string }>(files: T[]) {
   return grouped
 }
 
+// merge to file arrays, sort by creation date and generate filename
 export function organizeFolder<T extends { created: number }>(left: T[], right: T[], type: string) {
   const byCreationDate = (a: T, b: T) => a.created - b.created
-  const toMediaFile = (item: T, index: number) => ({
+  const addFileName = (item: T, index: number) => ({
     ...item,
     file: makeFileName(item.created, index, type),
   })
-  return [...left, ...right].sort(byCreationDate).map(toMediaFile)
+
+  return [...left, ...right].sort(byCreationDate).map(addFileName)
 }
 
 // sort file for move operations
 export function calcMoveCommands(files: MediaFile[], rootFolder: string) {
-  const filesToMove = files
+  if (!files.every((f) => f.folder === files[0].folder))
+    throw Error('all files must have the same folder')
+
+  let filesToMove = files
     .map((f) => ({ from: f.path, to: join(rootFolder, f.folder, f.file) }))
     .filter((f) => f.from !== f.to)
 
-  const unmoved = new Set(filesToMove)
+  if (new Set(filesToMove.map((f) => f.to)).size !== filesToMove.length)
+    throw Error('more than one file with the same target path detected')
 
-  //   const moveOrder = []
-  //   // alternating go forward and backward through the files
-  //   // and push files that will not overwrite to the moveOrder
-  //   files.forEach((file) => {
-  //     if (!filesContainPath(file.desiredPath)) {
-  //       moveOrder.push(file)
-  //       files.remove(file)
-  //     }
-  //   })
-  // }
+  const commands = []
 
-  return filesToMove
+  // iterate in alternating order (to not degenerate performance)
+  // over filesToMove until all commands are in an non overwriting order
+  const blocked = new Set(filesToMove.map((f) => f.from))
+  while (filesToMove.length > 0) {
+    const blockedCommands = []
+    for (let i = filesToMove.length; i-- > 0; ) {
+      const command = filesToMove[i]
+      if (blocked.has(command.to)) {
+        blockedCommands.push(command)
+      } else {
+        commands.push(command)
+        blocked.delete(command.from)
+      }
+    }
+    filesToMove = blockedCommands
+  }
+
+  return commands
 }
