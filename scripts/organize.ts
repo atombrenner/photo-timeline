@@ -65,8 +65,18 @@ export function calcMoveCommands(files: MediaFile[], rootFolder: string) {
         blockedCommands.push(command)
       } else {
         commands.push(command)
+        if (!blocked.has(command.from)) throw Error('attemt to remove an unknown blocked file')
         blocked.delete(command.from)
       }
+    }
+    if (filesToMove.length === blockedCommands.length) {
+      const cmd = blockedCommands.pop()
+      const parked = cmd!.to + '.parked'
+      if (blocked.has(parked)) throw Error('cannot find a move command order')
+      blocked.add(parked)
+      blocked.delete(cmd!.from)
+      commands.push({ from: cmd!.from, to: parked })
+      blockedCommands.push({ from: parked, to: cmd!.to })
     }
     filesToMove = blockedCommands
   }

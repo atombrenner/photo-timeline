@@ -1,3 +1,4 @@
+import { MediaFile } from './media-file'
 import { makeFileName } from './names'
 import { calcMoveCommands, organizeFolder } from './organize'
 
@@ -26,11 +27,11 @@ describe('organizeFolder', () => {
 describe('calcMoveCommands', () => {
   const root = '/root'
 
-  const makeMediaFile = (n: number) => ({
-    created: n,
-    path: `/path/${n}.jpg`,
+  const makeMediaFile = (from: number): MediaFile => ({
+    created: from,
+    path: `/path/${from}.jpg`,
     folder: 'some/folder',
-    file: `file_${n + 1}.jpg`,
+    file: `file_${from + 1}.jpg`,
   })
 
   it('should throw if not all files have the same foler', () => {
@@ -47,12 +48,71 @@ describe('calcMoveCommands', () => {
     expect(commands.map((c) => c.from)).not.toContain('/root/some/folder/file_1.jpg')
   })
 
-  it('should not move to existing files', () => {
+  const makeMovedMediaFile = ([from, to]: number[]): MediaFile => ({
+    created: 0,
+    path: `/f/${from}`,
+    folder: 'f',
+    file: `${to}`,
+  })
+
+  it('should generate intermediate copy command to break lock', () => {
     const files = [
-      {
-        path: '/root/some/folder/file_1.jpg',
-      },
-    ]
-    expect(true).toBe(false)
+      [2, 1],
+      [1, 2],
+    ].map(makeMovedMediaFile)
+    const commands = calcMoveCommands(files, '/')
+    console.log(commands)
+    expect(commands).toStrictEqual([
+      { from: '/f/2', to: '/f/1.parked' },
+      { from: '/f/1', to: '/f/2' },
+      { from: '/f/1.parked', to: '/f/1' },
+    ])
+  })
+
+  it('should generate intermediate copy commands to break locks', () => {
+    const files = [
+      [2, 1],
+      [1, 2],
+      [4, 3],
+      [3, 4],
+    ].map(makeMovedMediaFile)
+    const commands = calcMoveCommands(files, '/')
+    console.log(commands)
+    expect(commands).toStrictEqual([
+      { from: '/f/2', to: '/f/1.parked' },
+      { from: '/f/1', to: '/f/2' },
+      { from: '/f/1.parked', to: '/f/1' },
+      { from: '/f/3', to: '/f/4.parked' },
+      { from: '/f/4', to: '/f/3' },
+      { from: '/f/4.parked', to: '/f/4' },
+    ])
+  })
+
+  it('should handle copy up', () => {
+    const files = [
+      [1, 2],
+      [2, 3],
+      [3, 4],
+    ].map(makeMovedMediaFile)
+    const commands = calcMoveCommands(files, '/')
+    expect(commands).toStrictEqual([
+      { from: '/f/3', to: '/f/4' },
+      { from: '/f/2', to: '/f/3' },
+      { from: '/f/1', to: '/f/2' },
+    ])
+  })
+
+  it('should handle copy down', () => {
+    const files = [
+      [4, 3],
+      [3, 2],
+      [2, 1],
+    ].map(makeMovedMediaFile)
+    const commands = calcMoveCommands(files, '/')
+    expect(commands).toStrictEqual([
+      { from: '/f/2', to: '/f/1' },
+      { from: '/f/3', to: '/f/2' },
+      { from: '/f/4', to: '/f/3' },
+    ])
   })
 })
