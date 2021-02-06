@@ -1,13 +1,17 @@
 import { makeFileName, makeFolderName } from './names'
 import { join } from 'path'
-import { MediaFile } from './media-file'
-import { getImageCreationDate, readFolder } from './read'
+import { getImageCreationDate, readFiles } from './read'
 
 export interface ReadCreatedFn {
   (path: string): Promise<number>
 }
 
-// TODO: getVideoCreationDate
+export type MediaFile = {
+  path: string
+  created: number // Date
+  folder: string
+  file: string
+}
 
 async function makeMediaFile(path: string) {
   const created = await getImageCreationDate(path)
@@ -16,7 +20,8 @@ async function makeMediaFile(path: string) {
 }
 
 export async function readMediaFiles(folder: string) {
-  return readFolder(folder).then((files) => Promise.all(files.map(makeMediaFile)))
+  const pattern = /\.jpe?g$/i
+  return readFiles(folder, pattern).then((files) => Promise.all(files.map(makeMediaFile)))
 }
 
 export async function groupByFolder<T extends { folder: string }>(files: T[]) {
@@ -29,7 +34,12 @@ export async function groupByFolder<T extends { folder: string }>(files: T[]) {
   return grouped
 }
 
-// merge to file arrays, sort by creation date and generate filename
+export function assertAllFilesInSameFolder(files: { folder: string }[]) {
+  if (!files.every((f) => f.folder === files[0].folder))
+    throw Error('all files must have the same folder: ' + files.map((f) => f.folder).join(', '))
+}
+
+// merge two file arrays, sort by creation date and generate filename
 export function organizeFolder<T extends { created: number }>(left: T[], right: T[], type: string) {
   const byCreationDate = (a: T, b: T) => a.created - b.created
   const addFileName = (item: T, index: number) => ({
@@ -42,9 +52,6 @@ export function organizeFolder<T extends { created: number }>(left: T[], right: 
 
 // sort file for move operations
 export function calcMoveCommands(files: MediaFile[], rootFolder: string) {
-  if (!files.every((f) => f.folder === files[0].folder))
-    throw Error('all files must have the same folder')
-
   let filesToMove = files
     .map((f) => ({ from: f.path, to: join(rootFolder, f.folder, f.file) }))
     .filter((f) => f.from !== f.to)
@@ -69,6 +76,7 @@ export function calcMoveCommands(files: MediaFile[], rootFolder: string) {
         blocked.delete(command.from)
       }
     }
+    // detect case when two files swap, eg 1 -> 2 and 2 -> 1
     if (filesToMove.length === blockedCommands.length) {
       const cmd = blockedCommands.pop()
       const parked = cmd!.to + '.parked'

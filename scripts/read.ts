@@ -1,17 +1,10 @@
-import { readdir } from 'fs-extra'
+import { Dirent, readdir } from 'fs-extra'
 import { join } from 'path'
 import sharp from 'sharp'
 import parseExif, { Exif } from 'exif-reader'
-import { makeFileName, makeFolderName } from './names'
 
-export type MediaFile = {
-  path: string
-  created: number // Date
-  folder: string
-  file: string
-}
-
-export async function readFolder(folder: string, pattern = /\.(jpg|jpeg)$/i): Promise<string[]> {
+// read all file names from a folder and all subfolders recusively
+export async function readFiles(folder: string, pattern: RegExp): Promise<string[]> {
   const entries = await readdir(folder, { withFileTypes: true })
   const folders: string[] = []
   const files: string[] = []
@@ -22,8 +15,21 @@ export async function readFolder(folder: string, pattern = /\.(jpg|jpeg)$/i): Pr
       files.push(join(folder, entry.name))
     }
   }
-  const moreFiles = await Promise.all(folders.map((f) => readFolder(f, pattern)))
+  const moreFiles = await Promise.all(folders.map((f) => readFiles(f, pattern)))
   return [...files, ...moreFiles.flat()]
+}
+
+export async function readOrganizedFolders(folder: string): Promise<string[]> {
+  const isFolder = (pattern: RegExp) => (e: Dirent) => e.isDirectory() && pattern.test(e.name)
+  const entries = await readdir(folder, { withFileTypes: true })
+  const years = entries.filter(isFolder(/^\d{4}/)).map((e) => join(folder, e.name))
+  const foldersOfYears = await Promise.all(
+    years.map(async (folder) => {
+      const entries = await readdir(folder, { withFileTypes: true })
+      return entries.filter(isFolder(/^\d{2} .*/)).map((e) => join(folder, e.name))
+    }),
+  )
+  return foldersOfYears.flat()
 }
 
 export async function getImageCreationDate(path: string): Promise<number> {
@@ -31,9 +37,20 @@ export async function getImageCreationDate(path: string): Promise<number> {
     if (v == null) throw Error('Cannot get image creation date for ' + path)
     return v
   }
-  const pickExif = (m: sharp.Metadata) => throwIfUndefined(m.exif)
-  const pickCreationDate = (parsed: Exif) =>
-    +throwIfUndefined(parsed.exif.DateTimeOriginal || parsed.image.ModifyDate)
+  const pickExif = (m: sharp.Metadata) => m.exif // throwIfUndefined(m.exif)
+  const pickCreationDate = (parsed: Exif | undefined) => {
+    if (!parsed?.exif?.DateTimeOriginal || !parsed?.image?.ModifyDate) {
+      console.log(`${path}: no creation date`)
+      return 0
+    }
+    return +(parsed.exif.DateTimeOriginal || parsed.image.ModifyDate)
+  }
 
-  return sharp(path).metadata().then(pickExif).then(parseExif).then(pickCreationDate)
+  const safeParseExif = (exif: Buffer | undefined) => exif && parseExif(exif)
+
+  return sharp(path).metadata().then(pickExif).then(safeParseExif).then(pickCreationDate)
+}
+
+export async function getVideoCreationDate(path: string): Promise<number> {
+  throw Error('Not implemented')
 }

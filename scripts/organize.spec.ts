@@ -1,6 +1,6 @@
 import { MediaFile } from './media-file'
 import { makeFileName } from './names'
-import { calcMoveCommands, organizeFolder } from './organize'
+import { assertAllFilesInSameFolder, calcMoveCommands, organizeFolder } from './organize'
 
 describe('organizeFolder', () => {
   const files = [{ created: 100 }, { created: 1 }, { created: 10 }]
@@ -24,20 +24,20 @@ describe('organizeFolder', () => {
   })
 })
 
+const makeMediaFile = (from: number): MediaFile => ({
+  created: from,
+  path: `/path/${from}.jpg`,
+  folder: 'some/folder',
+  file: `file_${from + 1}.jpg`,
+})
+
+it('should throw if not all files have the same folder', () => {
+  const files = [makeMediaFile(1), { ...makeMediaFile(2), folder: 'different/folder' }]
+  expect(() => assertAllFilesInSameFolder(files)).toThrowError()
+})
+
 describe('calcMoveCommands', () => {
   const root = '/root'
-
-  const makeMediaFile = (from: number): MediaFile => ({
-    created: from,
-    path: `/path/${from}.jpg`,
-    folder: 'some/folder',
-    file: `file_${from + 1}.jpg`,
-  })
-
-  it('should throw if not all files have the same foler', () => {
-    const files = [makeMediaFile(1), { ...makeMediaFile(2), folder: 'different/folder' }]
-    expect(() => calcMoveCommands(files, root)).toThrowError()
-  })
 
   it('should drop files which do not need to be moved', () => {
     const files = [0, 1, 2, 3, 4].map(makeMediaFile)
@@ -61,7 +61,6 @@ describe('calcMoveCommands', () => {
       [1, 2],
     ].map(makeMovedMediaFile)
     const commands = calcMoveCommands(files, '/')
-    console.log(commands)
     expect(commands).toStrictEqual([
       { from: '/f/2', to: '/f/1.parked' },
       { from: '/f/1', to: '/f/2' },
@@ -77,7 +76,6 @@ describe('calcMoveCommands', () => {
       [3, 4],
     ].map(makeMovedMediaFile)
     const commands = calcMoveCommands(files, '/')
-    console.log(commands)
     expect(commands).toStrictEqual([
       { from: '/f/2', to: '/f/1.parked' },
       { from: '/f/1', to: '/f/2' },

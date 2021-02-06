@@ -1,12 +1,12 @@
 # TODO
 
-- read all photos recursively from a folder into a list
+- test compatibility with existing photos
 
 - describe motivation in readme
 
 - describe folder organization in readme
 
-- merge new photos with existing structure
+- create issue snowpack not serving files with unicode characters
 
 - duplicate detection and removal
 
