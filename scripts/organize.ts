@@ -19,8 +19,7 @@ async function makeMediaFile(path: string) {
   return { path, created, folder }
 }
 
-export async function readMediaFiles(folder: string) {
-  const pattern = /\.jpe?g$/i
+export async function readMediaFiles(folder: string, pattern: RegExp) {
   return readFiles(folder, pattern).then((files) => Promise.all(files.map(makeMediaFile)))
 }
 

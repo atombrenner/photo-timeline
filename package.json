@@ -8,7 +8,8 @@
     "test": "jest",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "prettier --check \"src/**/*.{js,jsx}\"",
-    "import": "ts-node -T -P scripts/tsconfig.json scripts/import"
+    "import": "ts-node -T -P scripts/tsconfig.json scripts/import",
+    "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
   },
   "dependencies": {
     "date-fns": "^2.16.1",
@@ -30,7 +31,6 @@
     "@types/jest": "^26.0.20",
     "@types/sharp": "^0.27.1",
     "babel-jest": "^26.6.3",
-    "chai": "^4.2.0",
     "exif-reader": "^1.0.3",
     "fs-extra": "^9.1.0",
     "identity-obj-proxy": "^3.0.0",

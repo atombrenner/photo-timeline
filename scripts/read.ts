@@ -10,7 +10,7 @@ export async function readFiles(folder: string, pattern: RegExp): Promise<string
   const files: string[] = []
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (entry.name[0] !== '.') folders.push(join(folder, entry.name))
+      if (!/^[_.]|00-no-date/.test(entry.name)) folders.push(join(folder, entry.name))
     } else if (pattern.test(entry.name)) {
       files.push(join(folder, entry.name))
     }
@@ -37,18 +37,11 @@ export async function getImageCreationDate(path: string): Promise<number> {
     if (v == null) throw Error('Cannot get image creation date for ' + path)
     return v
   }
-  const pickExif = (m: sharp.Metadata) => m.exif // throwIfUndefined(m.exif)
-  const pickCreationDate = (parsed: Exif | undefined) => {
-    if (!parsed?.exif?.DateTimeOriginal || !parsed?.image?.ModifyDate) {
-      console.log(`${path}: no creation date`)
-      return 0
-    }
-    return +(parsed.exif.DateTimeOriginal || parsed.image.ModifyDate)
-  }
+  const pickExif = (m: sharp.Metadata) => throwIfUndefined(m.exif)
+  const pickCreationDate = (parsed: Exif) =>
+    +throwIfUndefined(parsed.exif?.DateTimeOriginal || parsed.image.ModifyDate)
 
-  const safeParseExif = (exif: Buffer | undefined) => exif && parseExif(exif)
-
-  return sharp(path).metadata().then(pickExif).then(safeParseExif).then(pickCreationDate)
+  return sharp(path).metadata().then(pickExif).then(parseExif).then(pickCreationDate)
 }
 
 export async function getVideoCreationDate(path: string): Promise<number> {
