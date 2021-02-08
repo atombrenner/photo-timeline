@@ -1,6 +1,6 @@
 import { makeFileName, makeFolderName } from './names'
 import { join } from 'path'
-import { getImageCreationDate, readFiles } from './read'
+import { readImageCreationDate, readFiles } from './read'
 
 export interface ReadCreatedFn {
   (path: string): Promise<number>
@@ -14,7 +14,7 @@ export type MediaFile = {
 }
 
 async function makeMediaFile(path: string) {
-  const created = await getImageCreationDate(path)
+  const created = await readImageCreationDate(path)
   const folder = makeFolderName(created)
   return { path, created, folder }
 }

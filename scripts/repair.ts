@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { move, statSync } from 'fs-extra'
-import { getImageCreationDate, readFiles } from './read'
+import { readImageCreationDate, readFiles } from './read'
 import { format, toDate } from 'date-fns'
 
 const pattern = /\.jpe?g$/i
@@ -17,11 +17,11 @@ async function repairPhotos() {
   console.log('#!/bin/bash')
   console.log('set -euo pipefail')
 
-  const files = await readFiles('/home/christian/Data/Daten/Bilder/Photos', pattern)
-  //const files = await readFiles('/home/christian/Photos', pattern)
+  //const files = await readFiles('/home/christian/Data/Daten/Bilder/Photos', pattern)
+  const files = await readFiles('/home/christian/Photos', pattern)
   for (const file of files) {
     try {
-      await getImageCreationDate(file)
+      await readImageCreationDate(file)
     } catch {
       const stats = statSync(file)
       console.log(exiv2(file, toDate(stats.mtimeMs)))
@@ -30,3 +30,7 @@ async function repairPhotos() {
 }
 
 repairPhotos().catch(console.error)
+
+// readImageCreationDate('/home/christian/DCIM/PXL_20201227_101642738.jpg')
+//   .then(console.log)
+//   .catch(console.error)

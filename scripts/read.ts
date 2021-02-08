@@ -32,18 +32,22 @@ export async function readOrganizedFolders(folder: string): Promise<string[]> {
   return foldersOfYears.flat()
 }
 
-export async function getImageCreationDate(path: string): Promise<number> {
-  const throwIfUndefined = <T>(v?: T): T => {
-    if (v == null) throw Error('Cannot get image creation date for ' + path)
+export async function readImageCreationDate(path: string): Promise<number> {
+  const throwIfUndefined = <T>(v: T | undefined | null): T => {
+    if (!v) throw Error('Cannot get image creation date for ' + path)
     return v
   }
   const pickExif = (m: sharp.Metadata) => throwIfUndefined(m.exif)
-  const pickCreationDate = (parsed: Exif) =>
-    +throwIfUndefined(parsed.exif?.DateTimeOriginal || parsed.image.ModifyDate)
+  const pickCreationDate = (parsed: Exif) => {
+    const ms = Number('0.' + (parsed.exif?.SubSecTimeOriginal || '0')) * 1000
+    const created = +(parsed.exif?.DateTimeOriginal || 0) + ms
+    if (created < 1) throw Error('Cannot get image creation date for ' + path)
+    return created
+  }
 
   return sharp(path).metadata().then(pickExif).then(parseExif).then(pickCreationDate)
 }
 
-export async function getVideoCreationDate(path: string): Promise<number> {
+export async function readVideoCreationDate(path: string): Promise<number> {
   throw Error('Not implemented')
 }

@@ -7,7 +7,7 @@ import {
   organizeFolder,
   assertAllFilesInSameFolder,
 } from './organize'
-import { getImageCreationDate, readFiles } from './read'
+import { readImageCreationDate, readFiles } from './read'
 import { format, toDate } from 'date-fns'
 
 const rootFolder = `/home/christian/Photos`
@@ -38,7 +38,7 @@ async function importPhotos() {
 }
 
 async function organizePhotos() {
-  const created = await getImageCreationDate('/home/christian/Photos/00-no-date/test.jpg')
+  const created = await readImageCreationDate('/home/christian/Photos/00-no-date/test.jpg')
   console.log(toDate(created).toISOString())
 
   //const files = await readFiles('/home/christian/Data/Daten/Bilder/Photos', pattern)
