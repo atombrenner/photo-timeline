@@ -1,26 +1,29 @@
 import { makeFileName, makeFolderName } from './names'
-import { join } from 'path'
-import { readImageCreationDate, readFiles } from './read'
+import { join, extname } from 'path'
+import { readStats, ReadCreationDate } from './read'
 
-export interface ReadCreatedFn {
-  (path: string): Promise<number>
-}
-
-export type MediaFile = {
+export interface MediaFile {
   path: string
+  size: number
   created: number // Date
   folder: string
+}
+export interface FinalMediaFile extends MediaFile {
   file: string
 }
 
-async function makeMediaFile(path: string) {
-  const created = await readImageCreationDate(path)
-  const folder = makeFolderName(created)
-  return { path, created, folder }
-}
+export async function readMediaFiles(files: string[], readCreationDate: ReadCreationDate) {
+  const makeMediaFile = async (path: string): Promise<MediaFile> => {
+    const [{ size, modified }, creationDate] = await Promise.all([
+      readStats(path),
+      readCreationDate(path),
+    ])
+    const created = creationDate ?? modified
+    const folder = makeFolderName(created)
+    return { path, size, created, folder }
+  }
 
-export async function readMediaFiles(folder: string, pattern: RegExp) {
-  return readFiles(folder, pattern).then((files) => Promise.all(files.map(makeMediaFile)))
+  return Promise.all(files.map(makeMediaFile))
 }
 
 export async function groupByFolder<T extends { folder: string }>(files: T[]) {
@@ -38,19 +41,18 @@ export function assertAllFilesInSameFolder(files: { folder: string }[]) {
     throw Error('all files must have the same folder: ' + files.map((f) => f.folder).join(', '))
 }
 
-// merge two file arrays, sort by creation date and generate filename
-export function organizeFolder<T extends { created: number }>(left: T[], right: T[], type: string) {
-  const byCreationDate = (a: T, b: T) => a.created - b.created
-  const addFileName = (item: T, index: number) => ({
+// merge two file arrays with the same folder, sort by creation date and generate filename
+export function mergeFolder(left: MediaFile[], right: MediaFile[]): FinalMediaFile[] {
+  const byCreated = (a: MediaFile, b: MediaFile) => a.created - b.created
+  const makeFinalMediaFile = (item: MediaFile, index: number) => ({
     ...item,
-    file: makeFileName(item.created, index, type),
+    file: makeFileName(item.created, index, extname(item.path)),
   })
-
-  return [...left, ...right].sort(byCreationDate).map(addFileName)
+  return [...left, ...right].sort(byCreated).map(makeFinalMediaFile)
 }
 
 // sort file for move operations
-export function calcMoveCommands(files: MediaFile[], rootFolder: string) {
+export function calcMoveCommands(files: FinalMediaFile[], rootFolder: string) {
   let filesToMove = files
     .map((f) => ({ from: f.path, to: join(rootFolder, f.folder, f.file) }))
     .filter((f) => f.from !== f.to)

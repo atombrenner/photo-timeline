@@ -12,10 +12,10 @@ describe('makeFolderName', () => {
 
 describe('makeFileName', () => {
   it.each([
-    [new Date('2000-01-01'), 0, 'jpg', '2000-01-01 001.jpg'],
-    [new Date('2001-03-01'), 10, 'jpg', '2001-03-01 011.jpg'],
-    [new Date('2002-06-15'), 10, 'mpg', '2002-06-15 011.mpg'],
-    [new Date('2003-12-31'), 998, 'ext', '2003-12-31 999.ext'],
+    [new Date('2000-01-01'), 0, '.JPG', '2000-01-01 001.jpg'],
+    [new Date('2001-03-01'), 10, '.jpg', '2001-03-01 011.jpg'],
+    [new Date('2002-06-15'), 10, '.MP4', '2002-06-15 011.mp4'],
+    [new Date('2003-12-31'), 998, '.ext', '2003-12-31 999.ext'],
   ])(
     'creationDate %s with index %i should be formated as %s',
     (creationDate, index, type, expected) => {
