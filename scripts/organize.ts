@@ -13,7 +13,7 @@ export interface FinalMediaFile extends MediaFile {
 
 export async function readMediaFiles(files: string[], readCreationDate: ReadCreationDate) {
   const makeMediaFile = async (path: string): Promise<MediaFile> => {
-    const [{ size, modified }, creationDate] = await Promise.all([
+    const [{ modified }, creationDate] = await Promise.all([
       readStats(path),
       readCreationDate(path),
     ])

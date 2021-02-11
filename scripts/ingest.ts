@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { move, mkdirs } from 'fs-extra'
+import { move, mkdirp } from 'fs-extra'
 import {
   readMediaFiles,
   calcMoveCommands,
@@ -31,7 +31,8 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
   await Promise.all(
     Object.entries(grouped).map(async ([folder, files]) => {
       const folderPath = join(rootFolder, folder)
-      await mkdirs(folderPath) // if folder does not exist, create it
+      console.log(folderPath)
+      await mkdirp(folderPath) // if folder does not exist, create it
       const filesInTargetFolder = await readMediaFiles(folderPath)
       const mergedFiles = mergeFilesInFolder(files, filesInTargetFolder)
       assertAllFilesHaveSameFolder(mergedFiles)
@@ -43,7 +44,7 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
   )
 }
 
-const ingestPhotos = () => ingestMedia('/home/christian/DCIM', '/public/Photos', readPhotos)
-const ingestVideos = () => ingestMedia('/home/christian/DCIM', '/public/Videos', readVideos)
+const ingestPhotos = () => ingestMedia('/home/christian/DCIM', '/home/christian/Photos', readPhotos)
+const ingestVideos = () => ingestMedia('/home/christian/DCIM', '/home/christian/Videos', readVideos)
 
-ingestPhotos().then(console.info).catch(console.error)
+ingestVideos().then(console.info).catch(console.error)

@@ -8,6 +8,7 @@
     "test": "jest",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "prettier --check \"src/**/*.{js,jsx}\"",
+    "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
     "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
     "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
   },

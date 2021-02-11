@@ -2,6 +2,7 @@ import { readdir, stat } from 'fs-extra'
 import { join } from 'path'
 import sharp from 'sharp'
 import parseExif, { Exif } from 'exif-reader'
+import { ffprobe } from './ffprobe'
 
 // read all file names from a folder and all subfolders recusively
 export async function readFiles(folder: string, pattern: RegExp, minYear = ''): Promise<string[]> {
@@ -46,7 +47,10 @@ export async function readPhotoCreationDate(path: string): Promise<number> {
 
 export async function readVideoCreationDate(path: string): Promise<number> {
   // ideally get it from mp4 container
+  const { created } = await ffprobe(path) // works for avi, mp4, mov
+  if (!isNaN(created)) return created
+
   // try to guess it from path
-  // fallback to mtime
-  throw Error('Not implemented')
+
+  throw Error('Cannot get video creation date for ' + path)
 }
