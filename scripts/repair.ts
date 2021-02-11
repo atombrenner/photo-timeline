@@ -1,5 +1,4 @@
-import { join } from 'path'
-import { move, statSync } from 'fs-extra'
+import { statSync } from 'fs-extra'
 import { readPhotoCreationDate, readFiles } from './read'
 import { format, toDate } from 'date-fns'
 

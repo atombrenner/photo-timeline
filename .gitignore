@@ -3,3 +3,4 @@ build
 node_modules
 .tsbuildinfo
 public/Photos
+public/Videos

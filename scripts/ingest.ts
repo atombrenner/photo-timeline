@@ -1,17 +1,14 @@
 import { join } from 'path'
-import { move, mkdirs, fstatSync, statSync } from 'fs-extra'
+import { move, mkdirs } from 'fs-extra'
 import {
   readMediaFiles,
   calcMoveCommands,
   groupByFolder,
-  mergeFolder,
-  assertAllFilesInSameFolder,
+  mergeFilesInFolder,
+  assertAllFilesHaveSameFolder,
   MediaFile,
 } from './organize'
 import { readPhotoCreationDate, readFiles, readVideoCreationDate } from './read'
-import { format, toDate } from 'date-fns'
-
-// const rootFolder = `/home/christian/Photos`
 
 interface ReadMediaFiles {
   (folder: string): Promise<MediaFile[]>
@@ -27,8 +24,7 @@ async function readVideos(folder: string) {
   return await readMediaFiles(await readFiles(folder, pattern), readVideoCreationDate)
 }
 
-async function importMedia(from: string, rootFolder: string, readMediaFiles: ReadMediaFiles) {
-  // put generic import here
+async function ingestMedia(from: string, rootFolder: string, readMediaFiles: ReadMediaFiles) {
   const files = await readMediaFiles(from)
   const grouped = await groupByFolder(files)
 
@@ -36,18 +32,18 @@ async function importMedia(from: string, rootFolder: string, readMediaFiles: Rea
     Object.entries(grouped).map(async ([folder, files]) => {
       const folderPath = join(rootFolder, folder)
       await mkdirs(folderPath) // if folder does not exist, create it
-      const existingFiles = await readMediaFiles(folderPath)
-      const organizedFiles = mergeFolder(files, existingFiles)
-      assertAllFilesInSameFolder(organizedFiles)
-      // TODO: (over)writeJson(join(folderPath, 'index.json'))
-      for (const { from, to } of calcMoveCommands(organizedFiles, rootFolder)) {
-        console.log(`move ${from} ${to}`)
-        //await move(from, to)
+      const filesInTargetFolder = await readMediaFiles(folderPath)
+      const mergedFiles = mergeFilesInFolder(files, filesInTargetFolder)
+      assertAllFilesHaveSameFolder(mergedFiles)
+      for (const { from, to } of calcMoveCommands(mergedFiles, rootFolder)) {
+        await move(from, to)
+        console.log(`moved ${from} -> ${to}`)
       }
     }),
   )
 }
 
-const importPhotos = () => importMedia('/home/christian/DCIM', `/home/christian/Photos`, readPhotos)
+const ingestPhotos = () => ingestMedia('/home/christian/DCIM', '/public/Photos', readPhotos)
+const ingestVideos = () => ingestMedia('/home/christian/DCIM', '/public/Videos', readVideos)
 
-importPhotos().then(console.info).catch(console.error)
+ingestPhotos().then(console.info).catch(console.error)

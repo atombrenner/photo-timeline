@@ -1,10 +1,10 @@
 import { makeFileName } from './names'
 import {
-  assertAllFilesInSameFolder,
+  assertAllFilesHaveSameFolder,
   calcMoveCommands,
   FinalMediaFile,
   MediaFile,
-  mergeFolder,
+  mergeFilesInFolder,
 } from './organize'
 
 function fakeMediaFile(created: number): MediaFile {
@@ -21,17 +21,17 @@ describe('organizeFolder', () => {
   const moreFiles = [fakeMediaFile(1000), fakeMediaFile(3000), fakeMediaFile(2000)]
 
   it('should sort files', () => {
-    const filesInFolder = mergeFolder(files, [])
+    const filesInFolder = mergeFilesInFolder(files, [])
     expect(filesInFolder.map((f) => f.created)).toEqual([1, 10, 100])
   })
 
   it('should concat and sort files', () => {
-    const filesInFolder = mergeFolder(files, moreFiles)
+    const filesInFolder = mergeFilesInFolder(files, moreFiles)
     expect(filesInFolder.map((f) => f.created)).toEqual([1, 10, 100, 1000, 2000, 3000])
   })
 
   it('should attach file name', () => {
-    const filesInFolder = mergeFolder([fakeMediaFile(100000)], [fakeMediaFile(200000)])
+    const filesInFolder = mergeFilesInFolder([fakeMediaFile(100000)], [fakeMediaFile(200000)])
 
     expect(filesInFolder[0].file).toEqual(makeFileName(100000, 0, '.jpg'))
     expect(filesInFolder[1].file).toEqual(makeFileName(200000, 1, '.jpg'))
@@ -48,7 +48,7 @@ const fakeFinalMediaFile = (from: number): FinalMediaFile => ({
 
 it('should throw if not all files have the same folder', () => {
   const files = [fakeFinalMediaFile(1), { ...fakeFinalMediaFile(2), folder: 'different/folder' }]
-  expect(() => assertAllFilesInSameFolder(files)).toThrowError()
+  expect(() => assertAllFilesHaveSameFolder(files)).toThrowError()
 })
 
 describe('calcMoveCommands', () => {

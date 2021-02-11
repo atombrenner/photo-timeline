@@ -4,7 +4,6 @@ import { readStats, ReadCreationDate } from './read'
 
 export interface MediaFile {
   path: string
-  size: number
   created: number // Date
   folder: string
 }
@@ -20,7 +19,7 @@ export async function readMediaFiles(files: string[], readCreationDate: ReadCrea
     ])
     const created = creationDate ?? modified
     const folder = makeFolderName(created)
-    return { path, size, created, folder }
+    return { path, created, folder }
   }
 
   return Promise.all(files.map(makeMediaFile))
@@ -36,13 +35,13 @@ export async function groupByFolder<T extends { folder: string }>(files: T[]) {
   return grouped
 }
 
-export function assertAllFilesInSameFolder(files: { folder: string }[]) {
+export function assertAllFilesHaveSameFolder(files: { folder: string }[]) {
   if (!files.every((f) => f.folder === files[0].folder))
     throw Error('all files must have the same folder: ' + files.map((f) => f.folder).join(', '))
 }
 
 // merge two file arrays with the same folder, sort by creation date and generate filename
-export function mergeFolder(left: MediaFile[], right: MediaFile[]): FinalMediaFile[] {
+export function mergeFilesInFolder(left: MediaFile[], right: MediaFile[]): FinalMediaFile[] {
   const byCreated = (a: MediaFile, b: MediaFile) => a.created - b.created
   const makeFinalMediaFile = (item: MediaFile, index: number) => ({
     ...item,
