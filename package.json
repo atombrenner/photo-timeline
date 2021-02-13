@@ -10,7 +10,8 @@
     "lint": "prettier --check \"src/**/*.{js,jsx}\"",
     "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
     "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
-    "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
+    "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair",
+    "index": "ts-node -T -P scripts/tsconfig.json scripts/create-index"
   },
   "dependencies": {
     "date-fns": "^2.16.1",

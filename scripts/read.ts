@@ -5,13 +5,13 @@ import parseExif, { Exif } from 'exif-reader'
 import { ffprobe } from './ffprobe'
 
 // read all file names from a folder and all subfolders recusively
-export async function readFiles(folder: string, pattern: RegExp, minYear = ''): Promise<string[]> {
+export async function readFiles(folder: string, pattern: RegExp): Promise<string[]> {
   const entries = await readdir(folder, { withFileTypes: true })
   const folders: string[] = []
   const files: string[] = []
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (entry.name[0] !== '.' && folder > minYear) folders.push(join(folder, entry.name))
+      if (entry.name[0] !== '.') folders.push(join(folder, entry.name))
     } else if (pattern.test(entry.name)) {
       files.push(join(folder, entry.name))
     }
@@ -20,11 +20,19 @@ export async function readFiles(folder: string, pattern: RegExp, minYear = ''): 
   return [...files, ...moreFiles.flat()]
 }
 
+export async function readFolders(folder: string): Promise<string[]> {
+  const entries = await readdir(folder, { withFileTypes: true })
+  const folders = entries
+    .filter((e) => e.isDirectory() && e.name[0] !== '.')
+    .map((e) => join(folder, e.name))
+  const moreFolders = await Promise.all(folders.map(readFolders))
+  return [...folders, ...moreFolders.flat()]
+}
+
 export async function readStats(path: string) {
   const stats = await stat(path)
   return { size: stats.size, modified: stats.mtimeMs }
 }
-
 export interface ReadCreationDate {
   (path: string): Promise<number>
 }

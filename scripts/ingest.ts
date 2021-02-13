@@ -8,20 +8,22 @@ import {
   assertAllFilesHaveSameFolder,
   MediaFile,
 } from './organize'
-import { readPhotoCreationDate, readFiles, readVideoCreationDate } from './read'
+import { readPhotoCreationDate, readVideoCreationDate, readFiles } from './read'
+
+const photoPattern = /\.jpe?g$/i
+const videoPattern = /\.(mp4|mov|avi|wmv)$/i
+export const mediaPattern = /\.(jpe?g|mp4|mov|avi|wmv)$/i
 
 interface ReadMediaFiles {
   (folder: string): Promise<MediaFile[]>
 }
 
 async function readPhotos(folder: string) {
-  const pattern = /\.jpe?g$/i
-  return await readMediaFiles(await readFiles(folder, pattern), readPhotoCreationDate)
+  return await readMediaFiles(await readFiles(folder, photoPattern), readPhotoCreationDate)
 }
 
 async function readVideos(folder: string) {
-  const pattern = /\.mp4$/i
-  return await readMediaFiles(await readFiles(folder, pattern), readVideoCreationDate)
+  return await readMediaFiles(await readFiles(folder, videoPattern), readVideoCreationDate)
 }
 
 async function ingestMedia(from: string, rootFolder: string, readMediaFiles: ReadMediaFiles) {
