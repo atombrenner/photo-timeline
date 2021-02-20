@@ -1,6 +1,5 @@
 import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
-import { images } from './image-data'
 import './app.css'
 import { Photo } from './photo'
 
@@ -11,7 +10,11 @@ function stepImage(index: number, step: number, count: number) {
 // const next = (index: number) => stepImage(index, 1, images.length)
 // const prev = (index: number) => stepImage(index, -1, images.length)
 
-export function App() {
+type AppProps = Readonly<{
+  images: string[]
+}>
+
+export function App({ images }: AppProps) {
   const [current, setCurrent] = useState(0)
   const next = stepImage(current, 1, images.length)
   const prev = stepImage(current, -1, images.length)
@@ -23,18 +26,20 @@ export function App() {
   useEffect(() => ref.current.focus())
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    console.log(current)
+    const step = e.ctrlKey ? 30 : 1
     switch (e.code) {
       case 'Space':
       case 'ArrowRight':
-        if (!inTransition) setCurrent(next)
+        if (!inTransition) setCurrent(stepImage(current, step, images.length))
         break
       case 'ArrowLeft':
-        if (!inTransition) setCurrent(prev)
+        if (!inTransition) setCurrent(stepImage(current, -step, images.length))
         break
       default:
         return
     }
-    setInTransition(true) // fishy
+    //setInTransition(true) // fishy
     e.preventDefault()
   }
 

@@ -4,7 +4,7 @@ import { App } from './app'
 
 describe('<App>', () => {
   it('renders learn react link', () => {
-    const result = render(<App />)
+    const result = render(<App images={['a', 'b', 'c']} />)
     const photos = result.getAllByAltText(/photo/i)
     expect(photos).toHaveLength(3)
     expect(document.body.contains(photos[0]))

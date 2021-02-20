@@ -8,6 +8,7 @@
     "test": "jest",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "prettier --check \"src/**/*.{js,jsx}\"",
+    "serve": "http-server ~/Photos --cors --silent -p 9000",
     "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
     "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
     "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair",
@@ -15,6 +16,7 @@
   },
   "dependencies": {
     "date-fns": "^2.16.1",
+    "http-server": "^0.12.3",
     "preact": "^10.0.0",
     "tailwindcss": "^2.0.2"
   },
