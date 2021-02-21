@@ -7,6 +7,7 @@ export function makeFolderName(created: number) {
   return format(created, 'yyyy/MM MMMM', localized)
 }
 
+// no time information will be encoded in filename
 export function makeFileName(created: number, index: number, type: string) {
   const number = (index + 1).toString().padStart(3, '0')
   return format(created, 'yyyy-MM-dd', localized) + ` ${number}` + type.toLowerCase()

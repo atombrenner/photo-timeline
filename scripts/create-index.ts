@@ -1,35 +1,43 @@
-import { readdir, writeJson } from 'fs-extra'
+import { pathExists, readdir, writeJson } from 'fs-extra'
 import { join } from 'path'
 import { mediaPattern } from './ingest'
 import { readFiles } from './read'
 
-function readNumberedFolders(folder: string) {
-  return readdir(folder, { withFileTypes: true }).then((entries) =>
-    entries.filter((e) => e.isDirectory() && /\d+/.test(e.name)).map((e) => join(folder, e.name)),
-  )
+// reads organized media folders and creates a json like this:
+// {
+//   "2010/01 Januar": ["02 001.jpg", "02 002.jpg"],
+//   "2010/02 Februar": ["17 001.jpg"]
+// }
+
+// TODO: optimize index format by removing even more redundant stuff, possible only if only one extension exists
+// {
+//   "2010/01 Januar": [2, 2, 5], => could be expanded to ["2010-01-02-001.jpg", "2010-01-02-002.jpg", "2010-01-05-003.jpg"]
+// }
+
+async function readNumberedFolders(folder: string) {
+  const entries = await readdir(folder, { withFileTypes: true })
+  const folders = entries.filter((e) => e.isDirectory() && /\d+/.test(e.name))
+  return folders.map((f) => join(folder, f.name))
 }
 
-async function writeIndexFile(folder: string, entries: string[]) {
-  const length = folder.length + (folder.endsWith('/') ? 0 : 1)
-  const sorted = entries.map((e) => e.substr(length)).sort()
-  await writeJson(join(folder, 'index.json'), sorted)
-  return sorted
-}
-
-async function createRootIndexFile(root: string) {
+async function createIndex(root: string) {
   const years = await readNumberedFolders(root)
-  const folders = await Promise.all(years.map((year) => readNumberedFolders(year)))
-  return await writeIndexFile(root, folders.flat())
+  const months = await Promise.all(years.map((year) => readNumberedFolders(year)))
+  const folders = months.flat().sort()
+
+  let count = 0
+  const entries = await Promise.all(
+    folders.map(async (folder) => {
+      const pathLength = folder.length + 1 + 'yyyy-MM-'.length // strip redundant path info
+      const toFilename = (path: string) => path.substr(pathLength)
+      const files = await readFiles(folder, mediaPattern)
+      count += files.length
+      return [folder.substr(root.length + 1), files.sort().map(toFilename)]
+    }),
+  )
+
+  await writeJson(join(root, 'index.json'), Object.fromEntries(entries))
+  console.log(`indexed ${count} files`)
 }
 
-async function createFolderIndexFile(folder: string) {
-  const files = await readFiles(folder, mediaPattern)
-  return await writeIndexFile(folder, files)
-}
-
-async function createAllIndexFiles(root: string) {
-  const folders = await createRootIndexFile(root)
-  await Promise.all(folders.map((f) => createFolderIndexFile(join(root, f))))
-}
-
-createAllIndexFiles('/home/christian/Photos').catch(console.error)
+createIndex('/home/christian/Photos').catch(console.error)

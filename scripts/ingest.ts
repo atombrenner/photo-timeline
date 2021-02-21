@@ -12,6 +12,8 @@ import { readPhotoCreationDate, readVideoCreationDate, readFiles } from './read'
 
 const photoPattern = /\.jpe?g$/i
 const videoPattern = /\.(mp4|mov|avi|wmv)$/i
+
+// TODO: how to prevent exporting from direct callable scripts?
 export const mediaPattern = /\.(jpe?g|mp4|mov|avi|wmv)$/i
 
 interface ReadMediaFiles {
@@ -46,7 +48,13 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
   )
 }
 
-const ingestPhotos = () => ingestMedia('/home/christian/DCIM', '/home/christian/Photos', readPhotos)
-const ingestVideos = () => ingestMedia('/home/christian/DCIM', '/home/christian/Videos', readVideos)
+if (require.main === module) {
+  const ingestPhotos = () =>
+    ingestMedia('/home/christian/DCIM', '/home/christian/Photos', readPhotos)
 
-ingestVideos().then(console.info).catch(console.error)
+  const ingestVideos = () =>
+    ingestMedia('/home/christian/DCIM', '/home/christian/Videos', readVideos)
+
+  // called via import
+  ingestVideos().then(console.info).catch(console.error)
+}
