@@ -40,14 +40,22 @@ export function assertAllFilesHaveSameFolder(files: { folder: string }[]) {
     throw Error('all files must have the same folder: ' + files.map((f) => f.folder).join(', '))
 }
 
+const compare = new Intl.Collator('en').compare
+
 // merge two file arrays with the same folder, sort by creation date and generate filename
 export function mergeFilesInFolder(left: MediaFile[], right: MediaFile[]): FinalMediaFile[] {
-  const byCreated = (a: MediaFile, b: MediaFile) => a.created - b.created
+  const byCreated = (a: MediaFile, b: MediaFile) =>
+    a.created === b.created ? compare(a.path, b.path) : a.created - b.created
+
   const makeFinalMediaFile = (item: MediaFile, index: number) => ({
     ...item,
     file: makeFileName(item.created, index, extname(item.path)),
   })
-  return [...left, ...right].sort(byCreated).map(makeFinalMediaFile)
+
+  const rightPath = new Set(right.map((f) => f.path))
+  const uniqFiles = [...left.filter((f) => !rightPath.has(f.path)), ...right]
+
+  return uniqFiles.sort(byCreated).map(makeFinalMediaFile)
 }
 
 // sort file for move operations
@@ -72,7 +80,8 @@ export function calcMoveCommands(files: FinalMediaFile[], rootFolder: string) {
         blockedCommands.push(command)
       } else {
         commands.push(command)
-        if (!blocked.has(command.from)) throw Error('attemt to remove an unknown blocked file')
+        if (!blocked.has(command.from))
+          throw Error('attemt to remove an unknown blocked file: ' + command.from)
         blocked.delete(command.from)
       }
     }

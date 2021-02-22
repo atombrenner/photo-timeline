@@ -11,7 +11,7 @@ import { readFiles } from './read'
 
 // TODO: optimize index format by removing even more redundant stuff, possible only if only one extension exists
 // {
-//   "2010/01 Januar": [2, 2, 5], => could be expanded to ["2010-01-02-001.jpg", "2010-01-02-002.jpg", "2010-01-05-003.jpg"]
+//   "2010-01": [2, 2, 5], => could be expanded to [[2010,1,2]] => "/2010/01 Januar/2010-01-02 001.jpg" ["/2010/01 Januar/2010-01-02 001.jpg", "2010-01-02-002.jpg", "2010-01-05-003.jpg"]
 // }
 
 async function readNumberedFolders(folder: string) {

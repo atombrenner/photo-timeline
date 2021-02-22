@@ -1,8 +1,10 @@
 # TODO
 
-- reorg and normalize all existing media data
+- reorg and normalize all existing photos
 
 - read all photos and try to navigate
+
+- reorg and normalize all existing videos
 
 - escape hatch: if media is found without metadata, move it into a special folder
 

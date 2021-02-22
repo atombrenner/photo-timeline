@@ -7,10 +7,9 @@ import {
   mergeFilesInFolder,
 } from './organize'
 
-function fakeMediaFile(created: number): MediaFile {
+function fakeMediaFile(created: number, number = 0): MediaFile {
   return {
-    path: `${created}.jpg`,
-    size: created,
+    path: `${created}-${number}.jpg`,
     created,
     folder: '',
   }
@@ -30,6 +29,17 @@ describe('organizeFolder', () => {
     expect(filesInFolder.map((f) => f.created)).toEqual([1, 10, 100, 1000, 2000, 3000])
   })
 
+  it('should stable sort files with equal creation date', () => {
+    const files = [
+      fakeMediaFile(100, 1),
+      fakeMediaFile(100, 2),
+      fakeMediaFile(100, 3),
+      fakeMediaFile(200, 4),
+    ]
+    const filesInFolder = mergeFilesInFolder(files, files).map((f) => f.path)
+    expect(filesInFolder).toEqual(['100-1.jpg', '100-2.jpg', '100-3.jpg', '200-4.jpg'])
+  })
+
   it('should attach file name', () => {
     const filesInFolder = mergeFilesInFolder([fakeMediaFile(100000)], [fakeMediaFile(200000)])
 
@@ -39,7 +49,6 @@ describe('organizeFolder', () => {
 })
 
 const fakeFinalMediaFile = (from: number): FinalMediaFile => ({
-  size: from,
   created: from,
   path: `/path/${from}.jpg`,
   folder: 'some/folder',
@@ -65,7 +74,6 @@ describe('calcMoveCommands', () => {
 
   const makeMovedMediaFile = ([from, to]: number[]): FinalMediaFile => ({
     created: 0,
-    size: 0,
     path: `/f/${from}`,
     folder: 'f',
     file: `${to}`,

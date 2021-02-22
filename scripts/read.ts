@@ -1,4 +1,4 @@
-import { readdir, stat } from 'fs-extra'
+import { existsSync, readdir, stat } from 'fs-extra'
 import { join } from 'path'
 import sharp from 'sharp'
 import parseExif, { Exif } from 'exif-reader'
@@ -6,6 +6,7 @@ import { ffprobe } from './ffprobe'
 
 // read all file names from a folder and all subfolders recusively
 export async function readFiles(folder: string, pattern: RegExp): Promise<string[]> {
+  if (!existsSync(folder)) return [] // only necessary because in dry run folders are not created
   const entries = await readdir(folder, { withFileTypes: true })
   const folders: string[] = []
   const files: string[] = []
@@ -22,11 +23,9 @@ export async function readFiles(folder: string, pattern: RegExp): Promise<string
 
 export async function readFolders(folder: string): Promise<string[]> {
   const entries = await readdir(folder, { withFileTypes: true })
-  const folders = entries
+  return entries
     .filter((e) => e.isDirectory() && e.name[0] !== '.')
     .map((e) => join(folder, e.name))
-  const moreFolders = await Promise.all(folders.map(readFolders))
-  return [...folders, ...moreFolders.flat()]
 }
 
 export async function readStats(path: string) {
@@ -58,7 +57,8 @@ export async function readVideoCreationDate(path: string): Promise<number> {
   const { created } = await ffprobe(path) // works for avi, mp4, mov
   if (!isNaN(created)) return created
 
-  // try to guess it from path
+  // first try to guess it from path
+  // second guess it from mtime
 
   throw Error('Cannot get video creation date for ' + path)
 }

@@ -1,5 +1,5 @@
 {
-  "include": ["src", "types"],
+  "include": ["src", "types", "scripts"],
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
@@ -26,6 +26,5 @@
     "incremental": true,
     "isolatedModules": true,
     "tsBuildInfoFile": ".tsbuildinfo"
-    //"outDir": ".vscode" // only for incemental build info
   }
 }
