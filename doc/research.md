@@ -14,3 +14,7 @@ But the best way is to pick the date from mtime (modified) and encode it in the 
 =>when reorganizing, try to detect the pattern and use it as time
 
 ffprobe works for newer formats reliable
+
+## Tools
+
+- `rdfind --deleteduplicates true somedir`

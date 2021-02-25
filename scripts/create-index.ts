@@ -40,4 +40,4 @@ async function createIndex(root: string) {
   console.log(`indexed ${count} files`)
 }
 
-createIndex('/home/christian/Photos').catch(console.error)
+createIndex('/home/christian/Data/MyMedia/Photos').catch(console.error)

@@ -62,8 +62,13 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
 }
 
 if (require.main === module) {
-  const ingestPhotos = () =>
-    ingestMedia('/home/christian/Photos/2021', '/home/christian/Photos', readPhotos)
+  const Videos = '/home/christian/Videos'
+  const Photos = '/home/christian/Data/MyMedia/Photos'
+
+  const camera = '/run/media/christian/9016-4EF8/DCIM'
+  const pixel = '/home/christian/Pictures/Camera' // need top copy manual per PTP first
+
+  const ingestPhotos = () => ingestMedia(pixel, Photos, readPhotos)
 
   const ingestVideos = () =>
     ingestMedia('/home/christian/DCIM', '/home/christian/Videos', readVideos)
