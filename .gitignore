@@ -1,6 +1,5 @@
 .snowpack
-build
-node_modules
+/build/
+/node_modules
 .tsbuildinfo
-public/Photos
-public/Videos
+/.vscode/

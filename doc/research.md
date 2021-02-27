@@ -15,6 +15,15 @@ But the best way is to pick the date from mtime (modified) and encode it in the 
 
 ffprobe works for newer formats reliable
 
+## Conversion
+
+.mp4 should be the video container
+
+- `ffmpeg -i input.avi output.mp4` seems to work good enough
+- `ffmpeg -i input.wmv output.mp4` seems to work good enough
+
+The `-metadata creation_time=2019-01-01T12:00:00` can set the time to the generated file
+
 ## Tools
 
-- `rdfind --deleteduplicates true somedir`
+- `rdfind -deleteduplicates true somedir`

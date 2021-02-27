@@ -13,18 +13,21 @@ export function ffprobe(path: string) {
 
     ffprobe.on('close', (code) => {
       if (code) reject(Error(stderr))
-      const json = JSON.parse(stdout)
-      resolve({
-        duration: Number(json.format.duration),
-        created: Date.parse(json.format.tags.creation_time),
-      })
+      try {
+        const json = JSON.parse(stdout)
+        resolve({
+          duration: Number(json.format.duration),
+          created: Date.parse(json.format.tags.creation_time),
+        })
+      } catch (err) {
+        reject(err)
+      }
     })
   })
 }
 
 // if called via npm run ffprobe
 if (require.main === module) {
-  ffprobe(process.argv[2] || '/home/christian/Videos/PXL_20210211_170142848.mp4')
-    .then(console.log)
-    .catch(console.error)
+  console.log(process.argv)
+  ffprobe(process.argv[2]).then(console.log).catch(console.error)
 }
