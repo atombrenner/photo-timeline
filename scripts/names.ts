@@ -3,8 +3,14 @@ import { de } from 'date-fns/locale'
 
 const localized = { locale: de }
 
-export function makeFolderName(created: number) {
+export type MakeFolderName = (created: number) => string
+
+export function makePhotoFolderName(created: number) {
   return format(created, 'yyyy/MM MMMM', localized)
+}
+
+export function makeVideoFolderName(created: number) {
+  return format(created, 'yyyy', localized)
 }
 
 // no time information will be encoded in filename

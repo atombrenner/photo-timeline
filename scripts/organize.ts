@@ -1,6 +1,6 @@
-import { makeFileName, makeFolderName } from './names'
+import { makeFileName, MakeFolderName } from './names'
 import { join, extname } from 'path'
-import { readStats, ReadCreationDate } from './read'
+import { ReadCreationDate } from './read'
 
 export interface MediaFile {
   path: string
@@ -11,13 +11,13 @@ export interface FinalMediaFile extends MediaFile {
   file: string
 }
 
-export async function readMediaFiles(files: string[], readCreationDate: ReadCreationDate) {
+export async function readMediaFiles(
+  files: string[],
+  readCreationDate: ReadCreationDate,
+  makeFolderName: MakeFolderName,
+): Promise<MediaFile[]> {
   const makeMediaFile = async (path: string): Promise<MediaFile> => {
-    const [{ modified }, creationDate] = await Promise.all([
-      readStats(path),
-      readCreationDate(path),
-    ])
-    const created = creationDate ?? modified
+    const created = await readCreationDate(path)
     const folder = makeFolderName(created)
     return { path, created, folder }
   }

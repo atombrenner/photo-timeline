@@ -32,9 +32,8 @@ export async function readStats(path: string) {
   const stats = await stat(path)
   return { size: stats.size, modified: stats.mtimeMs }
 }
-export interface ReadCreationDate {
-  (path: string): Promise<number>
-}
+
+export type ReadCreationDate = (path: string) => Promise<number>
 
 export async function readPhotoCreationDate(path: string): Promise<number> {
   const throwIfUndefined = <T>(v: T | undefined | null): T => {
@@ -56,9 +55,5 @@ export async function readVideoCreationDate(path: string): Promise<number> {
   // ideally get it from mp4 container
   const { created } = await ffprobe(path) // works for avi, mp4, mov
   if (!isNaN(created)) return created
-
-  // first try to guess it from path
-  // second guess it from mtime
-
   throw Error('Cannot get video creation date for ' + path)
 }

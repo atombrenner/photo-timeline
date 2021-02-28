@@ -9,6 +9,7 @@ import {
   MediaFile,
 } from './organize'
 import { readPhotoCreationDate, readVideoCreationDate, readFiles, readFolders } from './read'
+import { makePhotoFolderName, makeVideoFolderName } from './names'
 
 const shouldRemoveEmptyFolder = true
 
@@ -18,16 +19,22 @@ const videoPattern = /\.(mp4|mov|avi|wmv)$/i
 // TODO: how to prevent exporting from direct callable scripts?
 export const mediaPattern = /\.(jpe?g|mp4|mov|avi|wmv)$/i
 
-interface ReadMediaFiles {
-  (folder: string): Promise<MediaFile[]>
-}
+type ReadMediaFiles = (folder: string) => Promise<MediaFile[]>
 
 async function readPhotos(folder: string) {
-  return await readMediaFiles(await readFiles(folder, photoPattern), readPhotoCreationDate)
+  return await readMediaFiles(
+    await readFiles(folder, photoPattern),
+    readPhotoCreationDate,
+    makePhotoFolderName,
+  )
 }
 
 async function readVideos(folder: string) {
-  return await readMediaFiles(await readFiles(folder, videoPattern), readVideoCreationDate)
+  return await readMediaFiles(
+    await readFiles(folder, videoPattern),
+    readVideoCreationDate,
+    makeVideoFolderName,
+  )
 }
 
 async function removeEmptyFolders(folder: string) {
@@ -62,7 +69,7 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
 }
 
 if (require.main === module) {
-  const Videos = '/home/christian/Videos'
+  const Videos = '/home/christian/Data/MyMedia/Videos'
   const Photos = '/home/christian/Data/MyMedia/Photos'
 
   const camera = '/run/media/christian/9016-4EF8/DCIM'
@@ -70,9 +77,8 @@ if (require.main === module) {
 
   const ingestPhotos = () => ingestMedia(pixel, Photos, readPhotos)
 
-  const ingestVideos = () =>
-    ingestMedia('/home/christian/DCIM', '/home/christian/Videos', readVideos)
+  const ingestVideos = () => ingestMedia('/home/christian/converted2', Videos, readVideos)
 
   // called via import
-  ingestPhotos().then(console.info).catch(console.error)
+  ingestVideos().then(console.info).catch(console.error)
 }

@@ -1,12 +1,20 @@
-import { makeFileName, makeFolderName } from './names'
+import { makeFileName, makePhotoFolderName, makeVideoFolderName } from './names'
 
 describe('makeFolderName', () => {
   it.each([
     [new Date('2000-01-01'), '2000/01 Januar'],
     [new Date('2000-03-01'), '2000/03 März'],
     [new Date('2000-12-31'), '2000/12 Dezember'],
-  ])('creationDate %s should be formated as %s', (creationDate, expected) => {
-    expect(makeFolderName(+creationDate)).toBe(expected)
+  ])('photo creationDate %s should be formated as %s', (creationDate, expected) => {
+    expect(makePhotoFolderName(+creationDate)).toBe(expected)
+  })
+
+  it.each([
+    [new Date('2000-01-01'), '2000'],
+    [new Date('2001-03-01'), '2001'],
+    [new Date('2002-12-31'), '2002'],
+  ])('video creationDate %s should be formated as %s', (creationDate, expected) => {
+    expect(makeVideoFolderName(+creationDate)).toBe(expected)
   })
 })
 
