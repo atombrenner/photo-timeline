@@ -1,6 +1,6 @@
 import { makeFileName, MakeFolderName } from './names'
 import { join, extname } from 'path'
-import { ReadCreationDate } from './read'
+import type { ReadCreationDate } from './read'
 
 export interface MediaFile {
   path: string

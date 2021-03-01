@@ -10,20 +10,15 @@ import {
 } from './organize'
 import { readPhotoCreationDate, readVideoCreationDate, readFiles, readFolders } from './read'
 import { makePhotoFolderName, makeVideoFolderName } from './names'
+import { MediaPattern, PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
 
 const shouldRemoveEmptyFolder = true
-
-const photoPattern = /\.jpe?g$/i
-const videoPattern = /\.(mp4|mov|avi|wmv)$/i
-
-// TODO: how to prevent exporting from direct callable scripts?
-export const mediaPattern = /\.(jpe?g|mp4|mov|avi|wmv)$/i
 
 type ReadMediaFiles = (folder: string) => Promise<MediaFile[]>
 
 async function readPhotos(folder: string) {
   return await readMediaFiles(
-    await readFiles(folder, photoPattern),
+    await readFiles(folder, PhotoPattern),
     readPhotoCreationDate,
     makePhotoFolderName,
   )
@@ -31,7 +26,7 @@ async function readPhotos(folder: string) {
 
 async function readVideos(folder: string) {
   return await readMediaFiles(
-    await readFiles(folder, videoPattern),
+    await readFiles(folder, VideoPattern),
     readVideoCreationDate,
     makeVideoFolderName,
   )
@@ -40,7 +35,7 @@ async function readVideos(folder: string) {
 async function removeEmptyFolders(folder: string) {
   const folders = await readFolders(folder)
   await Promise.all(folders.map(removeEmptyFolders))
-  const entries = await readFiles(folder, mediaPattern)
+  const entries = await readFiles(folder, MediaPattern)
   if (entries.length === 0) {
     console.log(`remove ${folder}`)
     await remove(folder)
@@ -68,17 +63,14 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
   if (shouldRemoveEmptyFolder) await removeEmptyFolders(from)
 }
 
-if (require.main === module) {
-  const Videos = '/home/christian/Data/MyMedia/Videos'
-  const Photos = '/home/christian/Data/MyMedia/Photos'
+async function ingest(source: string) {
+  await ingestMedia(source, PhotoRoot, readPhotos)
+  await ingestMedia(source, VideoRoot, readVideos)
+}
 
+if (require.main === module) {
   const camera = '/run/media/christian/9016-4EF8/DCIM'
   const pixel = '/home/christian/Pictures/Camera' // need top copy manual per PTP first
 
-  const ingestPhotos = () => ingestMedia(pixel, Photos, readPhotos)
-
-  const ingestVideos = () => ingestMedia('/home/christian/converted2', Videos, readVideos)
-
-  // called via import
-  ingestVideos().then(console.info).catch(console.error)
+  ingest(camera).catch(console.error)
 }

@@ -1,7 +1,16 @@
 import { pathExists, readdir, writeJson } from 'fs-extra'
 import { join } from 'path'
-import { mediaPattern } from './ingest'
+import { PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
 import { readFiles } from './read'
+
+// compact json representation of a list of string who share a common prefix
+// decoding is easy, encoding
+const compactIndes = {
+  jpg: [
+    { '2009/01 Januar/2009-01-': ['01 001', '02 002'] },
+    { '2009/02 Februar/2009-02-01 0': ['01', '02', '03', '05'] },
+  ],
+}
 
 // reads organized media folders and creates a json like this:
 // {
@@ -20,24 +29,18 @@ async function readNumberedFolders(folder: string) {
   return folders.map((f) => join(folder, f.name))
 }
 
-async function createIndex(root: string) {
-  const years = await readNumberedFolders(root)
-  const months = await Promise.all(years.map((year) => readNumberedFolders(year)))
-  const folders = months.flat().sort()
+async function createIndex(root: string, pattern: RegExp) {
+  const rawFiles = await readFiles(root, pattern)
 
-  let count = 0
-  const entries = await Promise.all(
-    folders.map(async (folder) => {
-      const pathLength = folder.length + 1 + 'yyyy-MM-'.length // strip redundant path info
-      const toFilename = (path: string) => path.substr(pathLength)
-      const files = await readFiles(folder, mediaPattern)
-      count += files.length
-      return [folder.substr(root.length + 1), files.sort().map(toFilename)]
-    }),
-  )
+  const redundantPrefix = root.length + 1
+  const files = rawFiles
+    .map((f) => f.substr(redundantPrefix))
+    .filter((f) => /^\d{4}/.test(f))
+    .sort()
 
-  await writeJson(join(root, 'index.json'), Object.fromEntries(entries))
-  console.log(`indexed ${count} files`)
+  await writeJson(join(root, 'index.json'), files)
+  console.log(`indexed ${files.length} files`)
 }
 
-createIndex('/home/christian/Data/MyMedia/Photos').catch(console.error)
+createIndex(PhotoRoot, PhotoPattern).catch(console.error)
+createIndex(VideoRoot, VideoPattern).catch(console.error)
