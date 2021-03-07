@@ -16,6 +16,6 @@ async function loadPhotos() {
 }
 
 loadPhotos().then((photos) => {
-  const root = document.getElementsByTagName('body')[0]
-  render(<App images={photos} />, root)
+  const root = document.getElementById('root')
+  render(<App images={photos} />, root!)
 })

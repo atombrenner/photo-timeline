@@ -49,7 +49,7 @@ MyMedia
 ## Usage
 
 - Connect a camera or phone with your computer, mount the DCIM folder
-- `npm run ingest <path_to_DCIM> <path_to_photo_folder>`
+- `npm run ingest <path_to_DCIM>`
 
 ## Future plans
 
