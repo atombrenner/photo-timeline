@@ -43,7 +43,7 @@ export async function readPhotoCreationDate(path: string): Promise<number> {
   const pickExif = (m: sharp.Metadata) => throwIfUndefined(m.exif)
   const pickCreationDate = (parsed: Exif) => {
     const ms = Number('0.' + (parsed.exif?.SubSecTimeOriginal || '0')) * 1000
-    const created = +(parsed.exif?.DateTimeOriginal || 0) + ms
+    const created = +(parsed.exif?.DateTimeOriginal || parsed.image?.ModifyDate || 0) + ms
     if (created < 1) throw Error('Cannot get image creation date for ' + path)
     return created
   }

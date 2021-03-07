@@ -69,8 +69,6 @@ async function ingest(source: string) {
 }
 
 if (require.main === module) {
-  const camera = '/run/media/christian/9016-4EF8/DCIM'
-  const pixel = '/home/christian/Pictures/Camera' // need top copy manual per PTP first
-
-  ingest(camera).catch(console.error)
+  const source = process.argv[2]
+  ingest(source).catch(console.error)
 }

@@ -2,12 +2,9 @@
 
 > ✨ Bootstrapped with Create Snowpack App (CSA).
 
-A simple application to organize and view photos and videos by creation time on your personal computer.
-
-Import media files into an organized folder structure from the command line.
-View photos and videos in chronological order in your favorite browser.
-Everything is statically generated, no backend services needed.
-It is possible to sync your organized files with cloud storage provide e.g. AWS S3.
+A minimal web app to view and browse photos organized on a timeline.
+Import photos and videos into an organized folder structure with a simple command-line tool.
+Sync organized files with cloud storage (AWS S3).
 
 ## Motivation
 
@@ -51,10 +48,8 @@ MyMedia
 
 ## Usage
 
-- Connect camera or phone with your computer, mount the DCIM folder
+- Connect a camera or phone with your computer, mount the DCIM folder
 - `npm run ingest <path_to_DCIM> <path_to_photo_folder>`
-- open index.html in root photo folder to browse all photos by time
--
 
 ## Future plans
 
