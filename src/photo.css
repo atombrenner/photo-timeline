@@ -30,3 +30,7 @@
   margin: auto; /* center horizontal */
   overflow: hidden;
 }
+
+.photo-cover {
+  object-fit: cover;
+}
