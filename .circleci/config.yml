@@ -4,14 +4,15 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/node:14
+      - image: cimg/node:14
     steps:
+      - checkout
       - run:
-          name: test
-          command: node --version
-      - build:
-          name: build artifact
+          name: build
           command: npm run build
+      - run:
+          name: echo npm version
+          command: npm version
 workflows:
   my-flow:
     jobs:
