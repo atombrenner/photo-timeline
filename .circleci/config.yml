@@ -11,16 +11,19 @@ jobs:
       - checkout
       - node/install-packages
       - run: npm run test:ci
-      - store_test_results:
-          path: ./results
-      - run: npm run build
+
+      - run: env
+
+      # - store_test_results:
+      #     path: ./results
+      # - run: npm run build
       # - store_artifacts:
       #     path: ./reports
       #     destination: reports
-      - aws-s3/sync:
-          from: ./build
-          to: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
-          arguments: '--storage-class STANDARD_IA --delete'
+      # - aws-s3/sync:
+      #     from: ./build
+      #     to: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
+      #     arguments: '--storage-class STANDARD_IA --delete'
 
   deploy-to-stage:
     docker:
@@ -40,13 +43,13 @@ workflows:
   continuous-delivery:
     jobs:
       - build
-      - deploy-to-stage:
-          requires:
-            - build
-      - approve-prod-deploy:
-          type: approval
-          requires:
-            - deploy-to-stage
-      - deploy-to-prod:
-          requires:
-            - approve-prod-deploy
+      # - deploy-to-stage:
+      #     requires:
+      #       - build
+      # - approve-prod-deploy:
+      #     type: approval
+      #     requires:
+      #       - deploy-to-stage
+      # - deploy-to-prod:
+      #     requires:
+      #       - approve-prod-deploy
