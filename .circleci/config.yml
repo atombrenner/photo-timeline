@@ -43,3 +43,10 @@ workflows:
       - deploy-to-stage:
           requires:
             - build
+      - approve-prod-deploy:
+          type: approval
+          requires:
+            - deploy-to-stage
+      - deploy-to-prod:
+          requires:
+            - hold
