@@ -7,9 +7,7 @@ jobs:
       - image: cimg/node:lts
     steps:
       - checkout
-      - run: 
-          name: echo npm version
-          command: npm --version
+      - run: npm ci
       - run:
           name: test
           command: npm run test
@@ -20,5 +18,5 @@ workflows:
   my-flow:
     jobs:
       - build
- 
+
 #
