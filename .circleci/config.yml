@@ -9,8 +9,10 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - run: mkdir -p /tmp/test-results/jest
-      - run: npm run test -- --json --outputFile /tmp/test-results/jest/results.json
+      - run:
+          command: npm run test:ci
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: /tmp/test-results/jest/
       - store_test_results:
           path: /tmp/test-results
       # - run: npm run build
