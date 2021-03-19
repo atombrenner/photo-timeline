@@ -1,6 +1,5 @@
 version: 2.1
-#orbs:
-#  node: circleci/node@4.2.0
+
 jobs:
   build:
     docker:
@@ -8,18 +7,16 @@ jobs:
     steps:
       - checkout
       - run: npm ci
-      - run:
-          name: test
-          command: npm run test
-      - run:
-          name: build
-          command: npm run build
+      - run: npm run test -- --json --outputFile /tmp/test_results.json
+      - store_test_results:
+          path: /tmp/test_results.json
+      - run: npm run build
       - store_artifacts:
           path: build
           destination: artifact-file
+
 workflows:
   my-flow:
     jobs:
       - build
 
-#
