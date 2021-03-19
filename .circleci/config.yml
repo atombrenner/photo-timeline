@@ -3,12 +3,15 @@ orbs:
   node: circleci/node@4.2.0
 jobs:
   build:
-    docker: 
+    docker:
       - image: circleci/node:14
     steps:
       - run:
           name: test
           command: node --version
+      - build:
+          name: build artifact
+          command: npm run build
 workflows:
   my-flow:
     jobs:
