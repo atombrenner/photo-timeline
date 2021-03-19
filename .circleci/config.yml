@@ -49,4 +49,4 @@ workflows:
             - deploy-to-stage
       - deploy-to-prod:
           requires:
-            - hold
+            - approve-prod-deploy
