@@ -3,6 +3,11 @@ orbs:
   node: circleci/node@4.2.0
   aws-s3: circleci/aws-s3@2.0.0
 
+parameters:
+  my-param:
+    type: string
+    default: 'XXX'
+
 jobs:
   build:
     docker:
@@ -20,10 +25,10 @@ jobs:
       # - store_artifacts:
       #     path: ./reports
       #     destination: reports
-      # - aws-s3/sync:
-      #     from: ./build
-      #     to: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
-      #     arguments: '--storage-class STANDARD_IA --delete'
+      - aws-s3/sync:
+          from: ./build
+          to: 's3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}'
+          arguments: '--storage-class STANDARD_IA --delete'
 
   deploy-to-stage:
     docker:
