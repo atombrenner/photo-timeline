@@ -3,14 +3,16 @@ orbs:
   node: circleci/node@4.2.0
 jobs:
   build:
-    executor: node
+    docker: 
+      - image: circleci/node:14
     steps:
       - run:
           name: test
           command: node --version
 workflows:
-  node-tests:
+  my-flow:
     jobs:
+      - build
       - node/test:
           version: 14.15.4
 
