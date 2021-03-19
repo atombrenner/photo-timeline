@@ -19,18 +19,27 @@ jobs:
       #     destination: reports
       - aws-s3/sync:
           from: ./build
-          to: s3://atombrenner/circleci/build
+          to: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
           arguments: '--storage-class STANDARD_IA --delete'
-  deploy:
+
+  deploy-to-stage:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/base:2020.01
     steps:
-      - run: ls build
+      - aws-s3/sync:
+          from: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
+          to: s3://atombrenner/circleci/stage
+
+  deploy-to-prod:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Dummy Deploy ${CIRCLE_BUILD_NUM}"
 
 workflows:
-  my-flow:
+  continuous-delivery:
     jobs:
       - build
-      - deploy:
+      - deploy-to-stage:
           requires:
             - build
