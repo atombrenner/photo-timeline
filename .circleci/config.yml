@@ -23,7 +23,7 @@ jobs:
     docker:
       - image: cimg/node:lts
     steps:
-      -run: ls build
+      - run: ls build
 
 workflows:
   my-flow:
