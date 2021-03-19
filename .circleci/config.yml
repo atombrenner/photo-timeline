@@ -1,6 +1,12 @@
 version: 2.1
 orbs:
   node: circleci/node@4.2.0
+jobs:
+  build:
+    steps:
+      - run:
+        name: test
+        command: node --version
 workflows:
   node-tests:
     jobs:
