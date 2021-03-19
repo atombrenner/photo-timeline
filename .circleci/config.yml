@@ -27,7 +27,7 @@ jobs:
       #     destination: reports
       - aws-s3/sync:
           from: ./build
-          to: 's3://atombrenner/circleci/build/<< env.CIRCLE_BUILD_NUM >>'
+          to: 's3://atombrenner/circleci/build/{{ .BuildNum }}'
           arguments: '--storage-class STANDARD_IA --delete'
 
   deploy-to-stage:
