@@ -3,10 +3,11 @@ orbs:
   node: circleci/node@4.2.0
 jobs:
   build:
+    executor: node
     steps:
       - run:
-        name: test
-        command: node --version
+          name: test
+          command: node --version
 workflows:
   node-tests:
     jobs:
