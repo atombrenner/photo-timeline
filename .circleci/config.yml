@@ -9,9 +9,9 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - run: npm run test -- --json --outputFile /tmp/test_results.json
+      - run: npm run test -- --json --outputFile /tmp/test-results/jest/results.json
       - store_test_results:
-          path: /tmp/test_results.json
+          path: /tmp/test-results
       - run: npm run build
       - store_artifacts:
           path: build
