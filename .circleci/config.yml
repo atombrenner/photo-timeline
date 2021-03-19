@@ -2,8 +2,9 @@ version: 2.1
 orbs:
   node: circleci/node@4.2.0
 workflows:
-  node-tests:
-    executor: node/14
+  node-tests:        
     jobs:
-      - node/test
+      - node/test:
+          version: 14.x 
+
       
