@@ -15,7 +15,8 @@ jobs:
 workflows:
   my-flow:
     jobs:
-      - build
+      - build:
+          requires: ["node/test"]
       - node/test:
           version: 14.15.4
 
