@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@4.2.0
+  aws-s3: circleci/aws-s3@2.0.0
 
 jobs:
   build:
@@ -9,16 +10,17 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - run:
-          command: npm run test:ci
-          environment:
-            JEST_JUNIT_OUTPUT_DIR: /tmp/test-results/jest/
+      - run: npm run test:ci
       - store_test_results:
-          path: /tmp/test-results
+          path: ./results
       - run: npm run build
-      - store_artifacts:
-          path: build
-          destination: artifact-file
+      # - store_artifacts:
+      #     path: ./reports
+      #     destination: reports
+      - aws-s3/copy:
+          from: ./build
+          to: s3://atombrenner/circleci/build
+          arguments: '--storage-class STANDARD_IA'
   deploy:
     docker:
       - image: cimg/node:lts
