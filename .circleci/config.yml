@@ -1,23 +1,24 @@
 version: 2.1
-orbs:
-  node: circleci/node@4.2.0
+#orbs:
+#  node: circleci/node@4.2.0
 jobs:
   build:
     docker:
-      - image: cimg/node:14
+      - image: cimg/node:lts
     steps:
       - checkout
+      - run: 
+          name: echo npm version
+          command: npm --version
+      - run:
+          name: test
+          command: npm run test
       - run:
           name: build
           command: npm run build
-      - run:
-          name: echo npm version
-          command: npm version
 workflows:
   my-flow:
     jobs:
-      - build:
-          requires: ["node/test"]
-      - node/test:
-          version: 14.15.4
-
+      - build
+ 
+#
