@@ -14,6 +14,4 @@ Ingestion:
 
 Other:
 
-- create issue snowpack not serving files with unicode characters
-
 - test how much photos can be shrinked with avif encoding, but keeping all existing exif metadata
