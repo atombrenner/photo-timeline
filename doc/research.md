@@ -27,3 +27,9 @@ The `-metadata creation_time=2019-01-01T12:00:00` can set the time to the genera
 ## Tools
 
 - `rdfind -deleteduplicates true somedir`
+
+## Avif
+
+quality of 80 saves between 50% and 90% but images have visible differences
+quality of 90 saves between 25% and 80% but images have still visible differences
+compression is very cpu intensive, one image takes 1 to 3 seconds, 4 cores are utilized at 100%
