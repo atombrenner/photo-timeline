@@ -7,6 +7,26 @@ export function prev(images: string[], index: number) {
   return (index <= 0 ? images.length : index) - 1
 }
 
+export function nextDay(images: string[], index: number) {
+  console.log('not implemented')
+  return index
+}
+
+export function nextWeek(images: string[], index: number) {
+  console.log('not implemented')
+  return index
+}
+
+export function prevDay(images: string[], index: number) {
+  console.log('not implemented')
+  return index
+}
+
+export function prevWeek(images: string[], index: number) {
+  console.log('not implemented')
+  return index
+}
+
 export function getMonth(imagePath: string): string {
   return imagePath.substr(imagePath.lastIndexOf('/') + 1, 7)
 }
