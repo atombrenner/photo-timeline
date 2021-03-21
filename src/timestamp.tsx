@@ -1,5 +1,5 @@
-import { h } from 'preact'
 import { format } from 'date-fns'
+import { h } from 'preact'
 import './timestamp.css'
 
 export type TimestampProps = {

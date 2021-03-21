@@ -1,10 +1,10 @@
 import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
-import './app.css'
-import { Photo } from './photo'
-import { Timestamp } from './timestamp'
 import { next, nextDay, nextWeek, nextMonth, nextYear } from './commands'
 import { prev, prevDay, prevWeek, prevMonth, prevYear } from './commands'
+import { Photo } from './photo'
+import { Timestamp } from './timestamp'
+import './app.css'
 
 type NavigationCommand = (images: string[], current: number) => number
 

@@ -32,6 +32,7 @@
     "@snowpack/plugin-dotenv": "^2.0.5",
     "@snowpack/plugin-typescript": "^1.2.0",
     "@testing-library/preact": "^2.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^2.0.1",
     "@tsconfig/node14": "^1.0.0",
     "@types/fs-extra": "^9.0.8",
     "@types/jest": "^26.0.21",
