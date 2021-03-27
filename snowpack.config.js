@@ -4,7 +4,7 @@ module.exports = {
     public: { url: '/', static: true },
     src: { url: '/dist' },
   },
-  plugins: ['@snowpack/plugin-dotenv', '@snowpack/plugin-typescript', '@prefresh/snowpack'],
+  plugins: ['@snowpack/plugin-typescript', '@prefresh/snowpack'],
   routes: [
     /* Enable an SPA Fallback in development: */
     // {"match": "routes", "src": ".*", "dest": "/index.html"},

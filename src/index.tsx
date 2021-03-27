@@ -3,9 +3,10 @@ import 'preact/devtools'
 import { App } from './app.jsx'
 import './index.css'
 
-const baseUrl = 'http://localhost:9000'
+// @ts-expect-error env property injected by snowpack with magic
+const baseUrl = import.meta.env.SNOWPACK_PUBLIC_MEDIA_URL
 
-const fetchJson = (url: string) => fetch(baseUrl + url, { mode: 'cors' }).then((res) => res.json())
+const fetchJson = (url: string) => fetch(baseUrl + url).then((res) => res.json())
 
 async function loadPhotos() {
   const index: string[] = await fetchJson('/index.json')
