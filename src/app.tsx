@@ -1,12 +1,12 @@
 import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
+import { next10, next20, next30, next50, prev10, prev20, prev30, prev50 } from './commands'
 import { next, nextDay, nextWeek, nextMonth, nextYear } from './commands'
 import { prev, prevDay, prevWeek, prevMonth, prevYear } from './commands'
+import type { NavigationCommand } from './commands'
 import { Photo } from './photo'
 import { Timestamp } from './timestamp'
 import './app.css'
-
-type NavigationCommand = (images: string[], current: number) => number
 
 // modifiers are appended in Alt Ctrl Shift order
 const kbd: Record<string, NavigationCommand | undefined> = {
@@ -28,6 +28,14 @@ const kbd: Record<string, NavigationCommand | undefined> = {
   SpaceCtrl: prev,
   SpaceShift: prev,
 
+  ArrowRightAlt: next10,
+  ArrowLeftAlt: prev10,
+  ArrowRightAltShift: next20,
+  ArrowLeftAltShift: prev20,
+  ArrowRightAltCtrl: next30,
+  ArrowLeftAltCtrl: prev30,
+  ArrorRightAltCtrlShift: next50,
+  ArrorLeftAltCtrlShift: prev50,
   // F1: toggleHelp
 }
 
@@ -36,6 +44,7 @@ function keyboardCommand(e: KeyboardEvent): NavigationCommand {
   if (e.altKey) key += 'Alt'
   if (e.ctrlKey) key += 'Ctrl'
   if (e.shiftKey) key += 'Shift'
+  console.log(key)
   const handler = kbd[key]
   if (handler) {
     e.preventDefault()
