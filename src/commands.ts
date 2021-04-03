@@ -2,23 +2,23 @@ import add from 'date-fns/add'
 
 export type NavigationCommand = (images: string[], current: number) => number
 
-const stepN = (count: number) => (images: string[], current: number) => {
+const skipN = (count: number) => (images: string[], current: number) => {
   current += count
   if (current < 0) return 0
   if (current >= images.length) return images.length - 1
   return current
 }
 
-export const next = stepN(1)
-export const next10 = stepN(10)
-export const next20 = stepN(20)
-export const next30 = stepN(30)
-export const next50 = stepN(50)
-export const prev = stepN(-1)
-export const prev10 = stepN(-10)
-export const prev20 = stepN(-20)
-export const prev30 = stepN(-30)
-export const prev50 = stepN(-50)
+export const next = skipN(1)
+export const next10 = skipN(10)
+export const next20 = skipN(20)
+export const next30 = skipN(30)
+export const next50 = skipN(50)
+export const prev = skipN(-1)
+export const prev10 = skipN(-10)
+export const prev20 = skipN(-20)
+export const prev30 = skipN(-30)
+export const prev50 = skipN(-50)
 
 function getDate(imagePath: string) {
   return imagePath.substr(imagePath.lastIndexOf('/') + 1, 10)

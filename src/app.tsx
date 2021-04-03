@@ -13,30 +13,32 @@ const kbd: Record<string, NavigationCommand | undefined> = {
   ArrowRight: next,
   ArrowRightShift: nextDay,
   ArrowRightCtrl: nextWeek,
-
-  ArrowDown: nextMonth,
-  ArrowDownCtrl: nextYear,
+  ArrowRightCtrlShift: nextMonth,
+  ArrowRightAlt: nextYear,
 
   ArrowLeft: prev,
   ArrowLeftShift: prevDay,
   ArrowLeftCtrl: prevWeek,
-  ArrowUp: prevMonth,
-  ArrowUpCtrl: prevYear,
+  ArrowLeftCtrlShift: prevMonth,
+  ArrowLeftAlt: prevYear,
+
+  ArrowDown: next10,
+  ArrowDownShift: next20,
+  ArrowDownCtrl: next30,
+  ArrowDownCtrlShift: next50,
+
+  ArrowUp: prev10,
+  ArrowUpShift: prev20,
+  ArrowUpCtrl: prev30,
+  ArrowUpCtrlShift: prev50,
+
+  PageDown: next50,
+  PageUp: prev50,
 
   Space: next,
   SpaceAlt: prev,
   SpaceCtrl: prev,
   SpaceShift: prev,
-
-  ArrowRightAlt: next10,
-  ArrowLeftAlt: prev10,
-  ArrowRightAltShift: next20,
-  ArrowLeftAltShift: prev20,
-  ArrowRightAltCtrl: next30,
-  ArrowLeftAltCtrl: prev30,
-  ArrorRightAltCtrlShift: next50,
-  ArrorLeftAltCtrlShift: prev50,
-  // F1: toggleHelp
 }
 
 function keyboardCommand(e: KeyboardEvent): NavigationCommand {
