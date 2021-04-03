@@ -1,10 +1,10 @@
 .timestamp {
   position: absolute;
   padding: 0px 6px 1px 6px;
-  font-size: 2rem;
+  font-size: 1.9rem;
   opacity: 60%;
-  margin-left: 20px;
-  margin-top: 20px;
+  right: 12px;
+  bottom: 1vh;
   background-color: #404040;
   border-radius: 6px;
 }
