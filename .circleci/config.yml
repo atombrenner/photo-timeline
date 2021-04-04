@@ -15,28 +15,26 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - run: npm run test:ci
-
-      - run: env
-
-      # - store_test_results:
-      #     path: ./results
-      # - run: npm run build
-      # - store_artifacts:
-      #     path: ./reports
-      #     destination: reports
-      - aws-s3/sync:
-          from: ./build
-          to: 's3://atombrenner/circleci/build/<< pipeline.env.CIRCLE_BUILD_NUM >>'
-          arguments: '--storage-class STANDARD_IA --delete'
+      - run: npm run test:ci      
+      - store_test_results:
+          path: ./results
+      - run: npm run build
+      - store_artifacts:
+          path: ./reports
+          destination: reports
+      # - aws-s3/sync:
+      #     from: ./build
+      #     to: 's3://atombrenner/circleci/build/<< pipeline.env.CIRCLE_BUILD_NUM >>'
+      #     arguments: '--storage-class STANDARD_IA --delete'
 
   deploy-to-stage:
     docker:
       - image: cimg/base:2020.01
-    steps:
-      - aws-s3/sync:
-          from: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
-          to: s3://atombrenner/circleci/stage
+    steps: 
+      - run: echo "Deploy ${CIRCLE_BUILD_NUM} to Stage"
+      # - aws-s3/sync:
+      #     from: s3://atombrenner/circleci/build/${CIRCLE_BUILD_NUM}
+      #     to: s3://atombrenner/circleci/stage
 
   deploy-to-prod:
     docker:
@@ -48,13 +46,13 @@ workflows:
   continuous-delivery:
     jobs:
       - build
-      # - deploy-to-stage:
-      #     requires:
-      #       - build
-      # - approve-prod-deploy:
-      #     type: approval
-      #     requires:
-      #       - deploy-to-stage
-      # - deploy-to-prod:
-      #     requires:
-      #       - approve-prod-deploy
+      - deploy-to-stage:
+          requires:
+            - build
+      - approve-prod-deploy:
+          type: approval
+          requires:
+            - deploy-to-stage
+      - deploy-to-prod:
+          requires:
+            - approve-prod-deploy
