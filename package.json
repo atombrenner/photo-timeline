@@ -4,13 +4,14 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "SNOWPACK_PUBLIC_MEDIA_URL=http://localhost:9000 snowpack dev",
-    "build": "SNOWPACK_PUBLIC_MEDIA_URL=/Photos snowpack build",
+    "build": "SNOWPACK_PUBLIC_MEDIA_URL=/Photos snowpack build && cp -r build/* ~/Data/MyMedia/",
     "test": "jest",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "prettier --check \"src/**/*.{js,jsx}\"",
     "serve": "http-server ~/Data/MyMedia/Photos --cors --silent -p 9000",
-    "prod": "http-server ~/Data/MyMedia --silent -p 3000",
+    "prod": "http-server ~/Data/MyMedia --silent -o index.html",
     "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
+    "ingest:camera": "ts-node -T -P scripts/tsconfig.json scripts/ingest /run/media/christian/9016-4EF8/DCIM/",
     "index": "ts-node -T -P scripts/tsconfig.json scripts/create-index",
     "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
     "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
