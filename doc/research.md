@@ -26,7 +26,8 @@ The `-metadata creation_time=2019-01-01T12:00:00` can set the time to the genera
 
 ## Tools
 
-- `rdfind -deleteduplicates true somedir`
+- `rdfind somedir` finds duplicates and creates result.txt with findings
+- `rdfind -deleteduplicates true somedir` deletes duplicates
 
 ## Avif
 
