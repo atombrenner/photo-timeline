@@ -6,6 +6,8 @@ A minimal web app to view and browse photos organized on a timeline.
 Import photos and videos into an organized folder structure with a simple command-line tool.
 Sync organized files with cloud storage (AWS S3).
 
+![CI Status](https://github.com/atombrenner/photo-timeline/actions/workflows/main.yml/badge.svg?branch=master)
+
 ## Motivation
 
 Many years ago, my digital photo library became a mess. I got tired of manually organize photos into folders or albums and needed an automated task that transfers media files from my camera to my photo folder on my pc. The simplest scheme I could imagine was to order by creation time and then group by month. This system was relatively easy to implement and worked for me. Vanilla OS tools were sufficient to browse and view all my photos. From then on, I implemented the same tool every few years with a different language and framework, either command line only or as old school windows desktop apps, starting with C#, Python, Ruby, Scala, and now Typescript.
@@ -51,23 +53,19 @@ MyMedia
 - Connect a camera or phone with your computer, mount the DCIM folder
 - `npm run ingest <path_to_DCIM>`
 
-## Future plans
-
-Convert photos to avif to save storage space and enable faster web access
-
 ## Development
 
 ### npm start
 
 Runs the app in the development mode.
-Open http://localhost:8080 to view it in the browser.
 
 ### npm test
 
-Launches the test runner in the interactive watch mode.
-See the section about running tests for more information.
+Runs all test
 
 ### npm run build
 
 Builds the app for production to the `build/` folder.
 It correctly bundles Preact in production mode and optimizes the build for the best performance.
+
+### npm run deploy
