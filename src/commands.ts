@@ -54,3 +54,14 @@ export const prevDay = prevDate({ days: -1 })
 export const prevWeek = prevDate({ weeks: -1 })
 export const prevMonth = prevDate({ months: -1 })
 export const prevYear = prevDate({ years: -1 })
+
+export const first = () => 0
+export const last = (images: string[]) => images.length - 1
+export const start = (images: string[]) => {
+  const stopDate = getDate(images[images.length - 1]).substr(0, 8) + '00'
+  console.log(stopDate)
+  for (let i = images.length - 1; i >= 0; i -= 1) {
+    if (getDate(images[i]) < stopDate) return i + 1
+  }
+  return 0
+}

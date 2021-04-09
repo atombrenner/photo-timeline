@@ -1,6 +1,7 @@
 import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
 import { next10, next20, next30, next50, prev10, prev20, prev30, prev50 } from './commands'
+import { first, last, start } from './commands'
 import { next, nextDay, nextWeek, nextMonth, nextYear } from './commands'
 import { prev, prevDay, prevWeek, prevMonth, prevYear } from './commands'
 import type { NavigationCommand } from './commands'
@@ -34,6 +35,8 @@ const kbd: Record<string, NavigationCommand | undefined> = {
 
   PageDown: next50,
   PageUp: prev50,
+  Home: first,
+  End: last,
 
   Space: next,
   SpaceAlt: prev,
@@ -52,6 +55,7 @@ function keyboardCommand(e: KeyboardEvent): NavigationCommand {
     e.preventDefault()
     return handler
   }
+  console.log(key)
   return (_, current) => current
 }
 
@@ -60,7 +64,7 @@ export type AppProps = Readonly<{
 }>
 
 export function App({ images }: AppProps) {
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(start(images))
   // const [showHelp, setShowHelp] = useState(false)
   // const [showDate, setShowDate] = useState(false)
 

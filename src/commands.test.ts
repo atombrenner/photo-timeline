@@ -1,7 +1,8 @@
-import { nextMonth, prevMonth, nextYear, prevYear, nextDay, prevDay, nextWeek } from './commands'
+import { nextMonth, prevMonth, nextDay, prevDay } from './commands'
 import { next, prev, next10, prev10 } from './commands'
+import { start } from './commands'
 
-describe('nextN', () => {
+describe('skipN', () => {
   it('should return last image if there is no next or prev image', () => {
     const images = ['/2000-01-01 1']
     expect(next(images, 0)).toEqual(0)
@@ -116,5 +117,12 @@ describe('prevMonth', () => {
     const images = ['/2000-01-15 1', '/2000-02-14 2']
     const next = prevMonth(images, images.length - 1)
     expect(images[next]).toEqual('/2000-01-15 1')
+  })
+})
+
+describe('start', () => {
+  it('should return first image of newest month', () => {
+    const images = ['/2000-01-01 2', '/2000-02-05 1', '/2000-02-05 2']
+    expect(images[start(images)]).toEqual('/2000-02-05 1')
   })
 })
