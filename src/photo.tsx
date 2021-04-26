@@ -3,6 +3,7 @@ import './photo.css'
 
 export type PhotoProps = Readonly<{
   src: string
+  rotation: number
   order: 'prev' | 'current' | 'next'
 }>
 

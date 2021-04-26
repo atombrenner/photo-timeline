@@ -10,7 +10,16 @@ import { Timestamp } from './timestamp'
 import './app.css'
 
 // modifiers are appended in Alt Ctrl Shift order
-const kbd: Record<string, NavigationCommand | undefined> = {
+function getCombinedKeyCode(e: KeyboardEvent): string {
+  let key = e.code
+  if (e.altKey) key += 'Alt'
+  if (e.ctrlKey) key += 'Ctrl'
+  if (e.shiftKey) key += 'Shift'
+  return key
+}
+
+// modifiers are appended in Alt Ctrl Shift order
+const navigationCommands: Record<string, NavigationCommand | undefined> = {
   ArrowRight: next,
   ArrowRightShift: nextDay,
   ArrowRightCtrl: nextWeek,
@@ -44,21 +53,6 @@ const kbd: Record<string, NavigationCommand | undefined> = {
   SpaceShift: prev,
 }
 
-function keyboardCommand(e: KeyboardEvent): NavigationCommand {
-  let key = e.code
-  if (e.altKey) key += 'Alt'
-  if (e.ctrlKey) key += 'Ctrl'
-  if (e.shiftKey) key += 'Shift'
-  console.log(key)
-  const handler = kbd[key]
-  if (handler) {
-    e.preventDefault()
-    return handler
-  }
-  console.log(key)
-  return (_, current) => current
-}
-
 export type AppProps = Readonly<{
   images: string[]
 }>
@@ -66,19 +60,36 @@ export type AppProps = Readonly<{
 export function App({ images }: AppProps) {
   const [current, setCurrent] = useState(start(images))
   // const [showHelp, setShowHelp] = useState(false)
-  // const [showDate, setShowDate] = useState(false)
+  const [showTimestamp, setShowTimestamp] = useState(false)
 
   const ref = useRef<HTMLDivElement>()
   useEffect(() => ref.current.focus(), [])
 
-  const handleKeyDown = (e: KeyboardEvent) => setCurrent(keyboardCommand(e)(images, current))
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const key = getCombinedKeyCode(e)
+    console.log(key)
+    const navigate = navigationCommands[key]
+    if (navigate) {
+      setCurrent(navigate(images, current))
+    }
+    // other commands
+    // - D -> toggle Date Display
+    // - R -> Rotate current image by 90 degrees
+    else if (key === 'KeyD') setShowTimestamp(!showTimestamp)
+    else if (key === 'KeyR') {
+      /*rotation[current] += 90 */
+    } else if (key === 'KeyRShift' || key === 'KeyRCtrl') {
+    } else return
+
+    e.preventDefault()
+  }
 
   return (
     <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
-      <Photo key={prev} src={images[prev(images, current)]} order="prev" />
-      <Photo key={current} src={images[current]} order="current" />
-      <Photo key={next} src={images[next(images, current)]} order="next" />
-      <Timestamp imageUrl={images[current]} />
+      <Photo key={prev} src={images[prev(images, current)]} rotation={0} order="prev" />
+      <Photo key={current} src={images[current]} rotation={0} order="current" />
+      <Photo key={next} src={images[next(images, current)]} rotation={0} order="next" />
+      {showTimestamp && <Timestamp imageUrl={images[current]} />}
     </div>
   )
 }
