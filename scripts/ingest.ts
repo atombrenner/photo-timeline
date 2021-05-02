@@ -1,5 +1,7 @@
-import { join } from 'path'
 import { move, mkdirp, remove } from 'fs-extra'
+import { join } from 'path'
+import { MediaPattern, PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
+import { makePhotoFolderName, makeVideoFolderName } from './names'
 import {
   readMediaFiles,
   calcMoveCommands,
@@ -9,8 +11,6 @@ import {
   MediaFile,
 } from './organize'
 import { readPhotoCreationDate, readVideoCreationDate, readFiles, readFolders } from './read'
-import { makePhotoFolderName, makeVideoFolderName } from './names'
-import { MediaPattern, PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
 
 const shouldRemoveEmptyFolder = true
 
@@ -32,13 +32,15 @@ async function readVideos(folder: string) {
   )
 }
 
+/** remove all folders without mediafiles in folder */
 async function removeEmptyFolders(folder: string) {
+  console.log(`removing ${folder}`)
   const folders = await readFolders(folder)
   await Promise.all(folders.map(removeEmptyFolders))
   const entries = await readFiles(folder, MediaPattern)
   if (entries.length === 0) {
-    console.log(`remove ${folder}`)
     await remove(folder)
+    console.log(`removed ${folder}`)
   }
 }
 

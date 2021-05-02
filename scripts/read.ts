@@ -1,7 +1,7 @@
+import parseExif, { Exif } from 'exif-reader'
 import { existsSync, readdir, stat } from 'fs-extra'
 import { join } from 'path'
 import sharp from 'sharp'
-import parseExif, { Exif } from 'exif-reader'
 import { ffprobe } from './ffprobe'
 
 // read all file names from a folder and all subfolders recusively
@@ -21,6 +21,7 @@ export async function readFiles(folder: string, pattern: RegExp): Promise<string
   return [...files, ...moreFiles.flat()]
 }
 
+/** return all folders in folder */
 export async function readFolders(folder: string): Promise<string[]> {
   const entries = await readdir(folder, { withFileTypes: true })
   return entries
