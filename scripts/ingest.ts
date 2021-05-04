@@ -12,35 +12,26 @@ import {
 } from './organize'
 import { readPhotoCreationDate, readVideoCreationDate, readFiles, readFolders } from './read'
 
-const shouldRemoveEmptyFolder = true
-
 type ReadMediaFiles = (folder: string) => Promise<MediaFile[]>
 
 async function readPhotos(folder: string) {
-  return await readMediaFiles(
-    await readFiles(folder, PhotoPattern),
-    readPhotoCreationDate,
-    makePhotoFolderName,
-  )
+  const files = await readFiles(folder, PhotoPattern)
+  return await readMediaFiles(files, readPhotoCreationDate, makePhotoFolderName)
 }
 
 async function readVideos(folder: string) {
-  return await readMediaFiles(
-    await readFiles(folder, VideoPattern),
-    readVideoCreationDate,
-    makeVideoFolderName,
-  )
+  const files = await readFiles(folder, VideoPattern)
+  return await readMediaFiles(files, readVideoCreationDate, makeVideoFolderName)
 }
 
 /** remove all folders without mediafiles in folder */
-async function removeEmptyFolders(folder: string) {
-  console.log(`removing ${folder}`)
+export async function removeFoldersWithoutMediaFiles(folder: string) {
   const folders = await readFolders(folder)
-  await Promise.all(folders.map(removeEmptyFolders))
+  await Promise.all(folders.map(removeFoldersWithoutMediaFiles))
   const entries = await readFiles(folder, MediaPattern)
   if (entries.length === 0) {
+    console.log(`remove ${folder}`)
     await remove(folder)
-    console.log(`removed ${folder}`)
   }
 }
 
@@ -61,8 +52,7 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
       }
     }),
   )
-  // not easy do dry run because it depends on files being moved
-  if (shouldRemoveEmptyFolder) await removeEmptyFolders(from)
+  await removeFoldersWithoutMediaFiles(from)
 }
 
 async function ingest(source: string) {

@@ -1,12 +1,11 @@
 import parseExif, { Exif } from 'exif-reader'
-import { existsSync, readdir, stat } from 'fs-extra'
+import { readdir, stat } from 'fs-extra'
 import { join } from 'path'
 import sharp from 'sharp'
 import { ffprobe } from './ffprobe'
 
 // read all file names from a folder and all subfolders recusively
 export async function readFiles(folder: string, pattern: RegExp): Promise<string[]> {
-  if (!existsSync(folder)) return [] // only necessary because in dry run folders are not created
   const entries = await readdir(folder, { withFileTypes: true })
   const folders: string[] = []
   const files: string[] = []
