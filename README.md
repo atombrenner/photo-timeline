@@ -52,6 +52,7 @@ MyMedia
 
 - Connect a camera or phone with your computer, mount the DCIM folder
 - `npm run ingest <path_to_DCIM>`
+- `npm run reindex` reorganize alle media files (e.g. after manual deletions or other manipulations)
 
 ## Development
 
@@ -65,7 +66,8 @@ Runs all test
 
 ### npm run build
 
-Builds the app for production to the `build/` folder.
 It correctly bundles Preact in production mode and optimizes the build for the best performance.
 
 ### npm run deploy
+
+Build and copy the app to ~/Data/MyMedia

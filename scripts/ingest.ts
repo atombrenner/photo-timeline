@@ -1,6 +1,7 @@
 import { move, mkdirp, remove } from 'fs-extra'
 import { join } from 'path'
 import { MediaPattern, PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
+import { createPhotoAndVideoIndex } from './create-index'
 import { makePhotoFolderName, makeVideoFolderName } from './names'
 import {
   readMediaFiles,
@@ -60,7 +61,13 @@ async function ingest(source: string) {
   await ingestMedia(source, VideoRoot, readVideos)
 }
 
+async function reindex() {
+  await ingest(PhotoRoot)
+  await ingest(VideoRoot)
+}
+
 if (require.main === module) {
   const source = process.argv[2]
-  ingest(source).catch(console.error)
+  const promise = source === 'reindex' ? reindex() : ingest(source)
+  promise.then(createPhotoAndVideoIndex).catch(console.error)
 }

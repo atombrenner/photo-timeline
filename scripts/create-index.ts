@@ -29,7 +29,7 @@ async function readNumberedFolders(folder: string) {
   return folders.map((f) => join(folder, f.name))
 }
 
-async function createIndex(root: string, pattern: RegExp) {
+export async function createIndex(root: string, pattern: RegExp) {
   const rawFiles = await readFiles(root, pattern)
 
   const redundantPrefix = root.length + 1
@@ -42,5 +42,11 @@ async function createIndex(root: string, pattern: RegExp) {
   console.log(`indexed ${files.length} files`)
 }
 
-createIndex(PhotoRoot, PhotoPattern).catch(console.error)
-createIndex(VideoRoot, VideoPattern).catch(console.error)
+export async function createPhotoAndVideoIndex() {
+  await createIndex(PhotoRoot, PhotoPattern)
+  await createIndex(VideoRoot, VideoPattern)
+}
+
+if (require.main === module) {
+  createPhotoAndVideoIndex().catch(console.error)
+}

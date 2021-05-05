@@ -14,7 +14,7 @@
     "prod": "http-server ~/Data/MyMedia --silent -o index.html",
     "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
     "ingest:camera": "ts-node -T -P scripts/tsconfig.json scripts/ingest /run/media/christian/9016-4EF8/DCIM/",
-    "index": "ts-node -T -P scripts/tsconfig.json scripts/create-index",
+    "reindex": "ts-node -T -P scripts/tsconfig.json scripts/ingest reindex",
     "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
     "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
   },
