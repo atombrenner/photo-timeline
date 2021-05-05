@@ -59,27 +59,20 @@ export type AppProps = Readonly<{
 
 export function App({ images }: AppProps) {
   const [current, setCurrent] = useState(start(images))
-  // const [showHelp, setShowHelp] = useState(false)
-  const [showTimestamp, setShowTimestamp] = useState(false)
+  const [showTimestamp, setShowTimestamp] = useState(true)
+  const [rotation, setRotation] = useState(() => new Array(images.length).fill(0))
 
   const ref = useRef<HTMLDivElement>()
   useEffect(() => ref.current.focus(), [])
 
   const handleKeyDown = (e: KeyboardEvent) => {
     const key = getCombinedKeyCode(e)
-    console.log(key)
     const navigate = navigationCommands[key]
-    if (navigate) {
-      setCurrent(navigate(images, current))
-    }
-    // other commands
-    // - D -> toggle Date Display
-    // - R -> Rotate current image by 90 degrees
+    if (navigate) setCurrent(navigate(images, current))
     else if (key === 'KeyD') setShowTimestamp(!showTimestamp)
-    else if (key === 'KeyR') {
-      /*rotation[current] += 90 */
-    } else if (key === 'KeyRShift' || key === 'KeyRCtrl') {
-    } else return
+    else if (key === 'KeyR') setRotation(rotate(rotation, current, 90))
+    else if (key === 'KeyRShift' || key === 'KeyRCtrl') setRotation(rotate(rotation, current, -90))
+    else return
 
     e.preventDefault()
   }
@@ -87,9 +80,15 @@ export function App({ images }: AppProps) {
   return (
     <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
       <Photo key={prev} src={images[prev(images, current)]} rotation={0} order="prev" />
-      <Photo key={current} src={images[current]} rotation={0} order="current" />
+      <Photo key={current} src={images[current]} rotation={rotation[current]} order="current" />
       <Photo key={next} src={images[next(images, current)]} rotation={0} order="next" />
       {showTimestamp && <Timestamp imageUrl={images[current]} />}
     </div>
   )
+}
+
+function rotate(rotation: number[], current: number, offset: number) {
+  const rotated = [...rotation]
+  rotated[current] = (rotated[current] + offset) % 360
+  return rotated
 }
