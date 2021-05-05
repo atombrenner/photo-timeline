@@ -1,6 +1,16 @@
 import { mkdtempSync, mkdirs, existsSync, writeFile } from 'fs-extra'
 import { removeFoldersWithoutMediaFiles } from './ingest'
 
+const log = console.log
+
+beforeAll(() => {
+  console.log = jest.fn()
+})
+
+afterAll(() => {
+  console.log = log
+})
+
 describe('removeFoldersWithoutMediaFiles', () => {
   const tmp = mkdtempSync('/tmp/DCIM')
 
