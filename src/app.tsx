@@ -79,9 +79,7 @@ export function App({ images }: AppProps) {
 
   return (
     <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
-      <Photo key={prev} src={images[prev(images, current)]} rotation={0} order="prev" />
-      <Photo key={current} src={images[current]} rotation={rotation[current]} order="current" />
-      <Photo key={next} src={images[next(images, current)]} rotation={0} order="next" />
+      <Photo src={images[current]} rotation={rotation[current]} order="current" />
       {showTimestamp && <Timestamp imageUrl={images[current]} />}
     </div>
   )
