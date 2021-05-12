@@ -23,7 +23,7 @@
     "exif-reader": "^1.0.3",
     "fs-extra": "^10.0.0",
     "preact": "^10.5.13",
-    "sharp": "^0.27.2"
+    "sharp": "^0.28.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
@@ -37,13 +37,13 @@
     "@tsconfig/node14": "^1.0.0",
     "@types/fs-extra": "^9.0.11",
     "@types/jest": "^26.0.23",
-    "@types/sharp": "^0.27.1",
+    "@types/sharp": "^0.28.1",
     "babel-jest": "^26.6.3",
     "http-server": "^0.12.3",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.6.3",
     "jest-junit": "^12.0.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "snowpack": "^3.3.7",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
