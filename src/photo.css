@@ -6,22 +6,6 @@
 
   margin: auto;
   width: 100%;
-
-  transition-property: transform;
-  transition-duration: 0.25s;
-  transition-timing-function: ease-in-out;
-}
-
-.photo-prev {
-  transform: translateX(-100vw);
-}
-
-.photo-current {
-  transform: translateX(0);
-}
-
-.photo-next {
-  transform: translateX(100vw);
 }
 
 .photo-image {

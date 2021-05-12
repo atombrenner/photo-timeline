@@ -3,7 +3,7 @@ import { h } from 'preact'
 import { App } from './app'
 
 describe('<App> with more than three images', () => {
-  it('should render at most three photo elements', () => {
+  it('should render a photo', () => {
     const result = render(
       <App
         images={[
@@ -16,7 +16,7 @@ describe('<App> with more than three images', () => {
       />,
     )
     const photos = result.getAllByAltText(/photo/i)
-    expect(photos).toHaveLength(3)
+    expect(photos).toHaveLength(1)
     expect(document.body.contains(photos[0]))
   })
 })
