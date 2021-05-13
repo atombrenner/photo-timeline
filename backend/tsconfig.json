@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/node14/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "declaration": false,
+    "sourceMap": true,
+    "noEmit": true,
+    "incremental": true
+  }
+}
