@@ -5,6 +5,7 @@
     "declaration": false,
     "sourceMap": true,
     "noEmit": true,
-    "incremental": true
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
   }
 }
