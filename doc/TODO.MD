@@ -1,11 +1,9 @@
 # TODO
 
-- display creation date
-  - 2017-02-12 12:00
-  - enable/disable
-- jump to beginning of next, current, previous month/year with
-  - keyboard
-  - mouse interaction (buttons)
+- delete photos
+  - move to trash folder
+  - remove from index.json
+- rotate photos
 - mouse toggle fullscreen (like F11)
 
 Ingestion:
