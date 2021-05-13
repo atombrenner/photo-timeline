@@ -2,6 +2,9 @@ import cors from '@koa/cors'
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import serveStatic from 'koa-static'
+import { join } from 'path'
+
+const photos = process.env.PHOTOS ?? join(__dirname, '..')
 
 const app = new Koa()
 app.use(bodyParser())
@@ -15,5 +18,6 @@ app.use(async (ctx, next) => {
     await next()
   }
 })
-app.use(serveStatic('/home/christian/Data/MyMedia/Photos/', { maxAge: 3600000 }))
+app.use(serveStatic(photos, { maxAge: 3600000 }))
+app.use(serveStatic(__dirname))
 app.listen(9000)

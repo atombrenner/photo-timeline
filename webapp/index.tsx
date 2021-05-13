@@ -4,7 +4,7 @@ import { App } from './app.jsx'
 import './index.css'
 
 // @ts-expect-error env property injected by snowpack with magic
-const baseUrl = import.meta.env.SNOWPACK_PUBLIC_MEDIA_URL
+const baseUrl = import.meta.env.SNOWPACK_PUBLIC_MEDIA_URL || ''
 
 const fetchJson = (url: string) => fetch(baseUrl + url).then((res) => res.json())
 
