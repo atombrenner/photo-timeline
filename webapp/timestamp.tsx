@@ -2,11 +2,11 @@ import { h } from 'preact'
 import './timestamp.css'
 
 export type TimestampProps = {
-  imageUrl: string
+  photo: string
 }
 
-export const Timestamp = ({ imageUrl }: TimestampProps) => {
-  return <div class="timestamp">{getDate(imageUrl)}</div>
+export const Timestamp = ({ photo }: TimestampProps) => {
+  return <div class="timestamp">{getDate(photo)}</div>
 }
 
 function getDate(path: string) {

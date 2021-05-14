@@ -7,6 +7,7 @@ export type PhotoProps = Readonly<{
 }>
 
 export function Photo({ src, rotation }: PhotoProps) {
+  console.log(src, rotation)
   return (
     <div class="photo">
       <img

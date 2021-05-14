@@ -1,5 +1,6 @@
 import { h } from 'preact'
 import { useState, useEffect, useRef } from 'preact/hooks'
+import { deletePhoto, loadPhotos, photoUrl, rotatePhoto } from './backend'
 import { next10, next20, next30, next50, prev10, prev20, prev30, prev50 } from './commands'
 import { first, last, start } from './commands'
 import { next, nextDay, nextWeek, nextMonth, nextYear } from './commands'
@@ -53,40 +54,50 @@ const navigationCommands: Record<string, NavigationCommand | undefined> = {
   SpaceShift: prev,
 }
 
-export type AppProps = Readonly<{
-  images: string[]
-}>
-
-export function App({ images }: AppProps) {
-  const [current, setCurrent] = useState(start(images))
+export function App() {
+  const [photos, setPhotos] = useState<string[]>([])
+  const [current, setCurrent] = useState(-1)
+  const [rotation, setRotation] = useState<Record<string, number>>({})
   const [showTimestamp, setShowTimestamp] = useState(true)
-  const [rotation, setRotation] = useState(() => new Array(images.length).fill(0))
 
   const ref = useRef<HTMLDivElement>()
-  useEffect(() => ref.current.focus(), [])
+  useEffect(() => {
+    ref.current.focus()
+    loadPhotos().then((photos) => {
+      setPhotos(photos)
+      setCurrent(start(photos))
+    })
+  }, [])
 
   const handleKeyDown = (e: KeyboardEvent) => {
     const key = getCombinedKeyCode(e)
     const navigate = navigationCommands[key]
-    if (navigate) setCurrent(navigate(images, current))
+    if (navigate) setCurrent(navigate(photos, current))
     else if (key === 'KeyD') setShowTimestamp(!showTimestamp)
-    else if (key === 'KeyR') setRotation(rotate(rotation, current, 90))
-    else if (key === 'KeyRShift' || key === 'KeyRCtrl') setRotation(rotate(rotation, current, -90))
-    else return
+    else if (key === 'KeyR') setRotation(rotate(rotation, photos[current], 90))
+    else if (key === 'KeyRShift' || key === 'KeyRCtrl')
+      setRotation(rotate(rotation, photos[current], -90))
+    else if (key === 'Delete') {
+      setPhotos([...photos.slice(0, current), ...photos.slice(current + 1)])
+      setCurrent(Math.min(current, photos.length - 1))
+      deletePhoto(photos[current])
+    } else return
 
     e.preventDefault()
   }
 
   return (
     <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
-      <Photo src={images[current]} rotation={rotation[current]} />
-      {showTimestamp && <Timestamp imageUrl={images[current]} />}
+      {/* TODO: figure out if check inside component is more elegant */}
+      {photos.length > 0 && (
+        <Photo src={photoUrl(photos[current])} rotation={rotation[photos[current]] || 0} />
+      )}
+      {showTimestamp && photos.length > 0 && <Timestamp photo={photos[current]} />}
     </div>
   )
 }
 
-function rotate(rotation: number[], current: number, offset: number) {
-  const rotated = [...rotation]
-  rotated[current] = (rotated[current] + offset) % 360
-  return rotated
+function rotate(rotation: Record<string, number>, photo: string, degree: number) {
+  rotatePhoto(photo, degree)
+  return { ...rotation, [photo]: ((rotation[photo] || 0) + degree) % 360 }
 }

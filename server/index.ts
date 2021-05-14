@@ -12,6 +12,7 @@ app.use(cors())
 app.use(async (ctx, next) => {
   if (ctx.method === 'DELETE') {
     ctx.body = 'deleted'
+    console.log(decodeURIComponent(ctx.URL.pathname))
   } else if (ctx.method === 'POST') {
     ctx.body = JSON.stringify(ctx.request.body)
   } else {
