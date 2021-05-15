@@ -3,7 +3,7 @@
   "repository": "",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "start": "SNOWPACK_PUBLIC_MEDIA_URL=http://localhost:9000 snowpack dev",
+    "start": "snowpack dev",
     "build:webapp": "snowpack build",
     "deploy": "npm run build && cp -r build/* /home/christian/Data/MyMedia/Photos/app",
     "tsc": "tsc --build scripts webapp server",
@@ -32,14 +32,14 @@
     "sharp": "^0.28.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.0",
-    "@babel/preset-env": "^7.14.1",
+    "@babel/core": "^7.14.2",
+    "@babel/preset-env": "^7.14.2",
     "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "^7.13.0",
     "@prefresh/snowpack": "^3.1.2",
     "@snowpack/plugin-typescript": "^1.2.0",
     "@testing-library/preact": "^2.0.0",
-    "@trivago/prettier-plugin-sort-imports": "^2.0.1",
+    "@trivago/prettier-plugin-sort-imports": "^2.0.2",
     "@tsconfig/node14": "^1.0.0",
     "@types/fs-extra": "^9.0.11",
     "@types/jest": "^26.0.23",
@@ -55,7 +55,7 @@
     "jest": "^26.6.3",
     "jest-junit": "^12.0.0",
     "prettier": "^2.3.0",
-    "snowpack": "^3.3.7",
+    "snowpack": "^3.4.0",
     "ts-node": "^9.1.1",
     "ts-node-dev": "^1.1.6",
     "typescript": "^4.2.4"

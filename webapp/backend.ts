@@ -1,8 +1,4 @@
-// does not work in tests
-// https://github.com/snowpackjs/create-snowpack-app/commit/c84d51bf5d10db82d6ff459dc9618710ea72f293
-
-// @ts-expect-error env property injected by snowpack with magic
-const baseUrl = import.meta.env.SNOWPACK_PUBLIC_MEDIA_URL || ''
+const baseUrl = 'http://localhost:9000'
 
 export const photoUrl = (photo: string) => `${baseUrl}/${photo}`
 
