@@ -5,7 +5,7 @@
   "scripts": {
     "start": "snowpack dev",
     "build:webapp": "snowpack build",
-    "deploy": "npm run build && cp -r build/* /home/christian/Data/MyMedia/Photos/app",
+    "deploy": "npm run build && rm -rf /home/christian/Data/MyMedia/Photos/_app_ && cp -r build /home/christian/Data/MyMedia/Photos/_app_",
     "tsc": "tsc --build scripts webapp server",
     "build": "npm run build:webapp && npm run build:server",
     "test": "jest",

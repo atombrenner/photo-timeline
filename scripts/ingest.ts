@@ -53,17 +53,17 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
       }
     }),
   )
-  await removeFoldersWithoutMediaFiles(from)
 }
 
 async function ingest(source: string) {
   await ingestMedia(source, PhotoRoot, readPhotos)
   await ingestMedia(source, VideoRoot, readVideos)
+  await removeFoldersWithoutMediaFiles(source)
 }
 
 async function reindex() {
-  await ingest(PhotoRoot)
-  await ingest(VideoRoot)
+  await ingestMedia(PhotoRoot, PhotoRoot, readPhotos)
+  await ingestMedia(VideoRoot, VideoRoot, readVideos)
 }
 
 if (require.main === module) {

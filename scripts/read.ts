@@ -4,6 +4,9 @@ import { join } from 'path'
 import sharp from 'sharp'
 import { ffprobe } from './ffprobe'
 
+// ignore folders starting with a dot or are surrounded with underscores
+const ignoredFolders = /^((\..*)|(_.*_))$/
+
 // read all file names from a folder and all subfolders recusively
 export async function readFiles(folder: string, pattern: RegExp): Promise<string[]> {
   const entries = await readdir(folder, { withFileTypes: true })
@@ -11,7 +14,7 @@ export async function readFiles(folder: string, pattern: RegExp): Promise<string
   const files: string[] = []
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (entry.name[0] !== '.') folders.push(join(folder, entry.name))
+      if (!ignoredFolders.test(entry.name)) folders.push(join(folder, entry.name))
     } else if (pattern.test(entry.name)) {
       files.push(join(folder, entry.name))
     }
