@@ -59,6 +59,8 @@ export function App() {
   const [current, setCurrent] = useState(-1) // index of currently displayed photo
   const [rotations, setRotations] = useState<Record<string, number>>({})
   const [showTimestamp, setShowTimestamp] = useState(true)
+  const currentPhoto = photos[current]
+  const currentRotation = rotations[photos[current]] || 0
 
   const ref = useRef<HTMLDivElement>()
   useEffect(() => {
@@ -70,16 +72,15 @@ export function App() {
   }, [])
 
   const rotateCurrent = (degrees: number) => {
-    const photo = photos[current]
-    const rotation = ((rotations[photo] || 0) + degrees) % 360
-    setRotations({ ...rotations, [photo]: rotation })
-    rotatePhoto(photo, rotation)
+    const rotation = (currentRotation + degrees) % 360
+    rotatePhoto(currentPhoto, rotation)
+    setRotations({ ...rotations, [currentPhoto]: rotation })
   }
 
   const deleteCurrent = () => {
+    deletePhoto(currentPhoto)
     setPhotos([...photos.slice(0, current), ...photos.slice(current + 1)])
     setCurrent(Math.min(current, photos.length - 2))
-    deletePhoto(photos[current])
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -97,11 +98,8 @@ export function App() {
 
   return (
     <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
-      {/* TODO: figure out if check inside component is more elegant */}
-      {photos.length > 0 && (
-        <Photo src={photoUrl(photos[current])} rotation={rotations[photos[current]] || 0} />
-      )}
-      {showTimestamp && photos.length > 0 && <Timestamp photo={photos[current]} />}
+      {currentPhoto && <Photo src={photoUrl(currentPhoto)} rotation={currentRotation} />}
+      {showTimestamp && currentPhoto && <Timestamp photo={currentPhoto} />}
     </div>
   )
 }
