@@ -56,8 +56,8 @@ const navigationCommands: Record<string, NavigationCommand | undefined> = {
 
 export function App() {
   const [photos, setPhotos] = useState<string[]>([])
-  const [current, setCurrent] = useState(-1)
-  const [rotation, setRotation] = useState<Record<string, number>>({})
+  const [current, setCurrent] = useState(-1) // index of currently displayed photo
+  const [rotations, setRotations] = useState<Record<string, number>>({})
   const [showTimestamp, setShowTimestamp] = useState(true)
 
   const ref = useRef<HTMLDivElement>()
@@ -69,19 +69,28 @@ export function App() {
     })
   }, [])
 
+  const rotateCurrent = (degrees: number) => {
+    const photo = photos[current]
+    const rotation = ((rotations[photo] || 0) + degrees) % 360
+    setRotations({ ...rotations, [photo]: rotation })
+    rotatePhoto(photo, rotation)
+  }
+
+  const deleteCurrent = () => {
+    setPhotos([...photos.slice(0, current), ...photos.slice(current + 1)])
+    setCurrent(Math.min(current, photos.length - 2))
+    deletePhoto(photos[current])
+  }
+
   const handleKeyDown = (e: KeyboardEvent) => {
     const key = getCombinedKeyCode(e)
     const navigate = navigationCommands[key]
     if (navigate) setCurrent(navigate(photos, current))
     else if (key === 'KeyD') setShowTimestamp(!showTimestamp)
-    else if (key === 'KeyR') setRotation(rotate(rotation, photos[current], 90))
-    else if (key === 'KeyRShift' || key === 'KeyRCtrl')
-      setRotation(rotate(rotation, photos[current], -90))
-    else if (key === 'Delete') {
-      setPhotos([...photos.slice(0, current), ...photos.slice(current + 1)])
-      setCurrent(Math.min(current, photos.length - 1))
-      deletePhoto(photos[current])
-    } else return
+    else if (key === 'KeyR') rotateCurrent(90)
+    else if (key === 'KeyRShift' || key === 'KeyRCtrl') rotateCurrent(-90)
+    else if (key === 'Delete') deleteCurrent()
+    else return
 
     e.preventDefault()
   }
@@ -90,14 +99,9 @@ export function App() {
     <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
       {/* TODO: figure out if check inside component is more elegant */}
       {photos.length > 0 && (
-        <Photo src={photoUrl(photos[current])} rotation={rotation[photos[current]] || 0} />
+        <Photo src={photoUrl(photos[current])} rotation={rotations[photos[current]] || 0} />
       )}
       {showTimestamp && photos.length > 0 && <Timestamp photo={photos[current]} />}
     </div>
   )
-}
-
-function rotate(rotation: Record<string, number>, photo: string, degree: number) {
-  rotatePhoto(photo, degree)
-  return { ...rotation, [photo]: ((rotation[photo] || 0) + degree) % 360 }
 }

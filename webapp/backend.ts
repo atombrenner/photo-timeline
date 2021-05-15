@@ -7,4 +7,8 @@ export const loadPhotos = () => fetch(baseUrl + '/index.json').then((res) => res
 export const deletePhoto = (photo: string) => fetch(photoUrl(photo), { method: 'DELETE' })
 
 export const rotatePhoto = (photo: string, rotation: number) =>
-  fetch(photoUrl(photo), { method: 'POST', body: JSON.stringify({ rotation }) })
+  fetch(photoUrl(photo), {
+    method: 'POST',
+    body: JSON.stringify({ rotation }),
+    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+  })
