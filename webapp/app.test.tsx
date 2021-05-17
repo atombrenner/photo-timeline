@@ -1,6 +1,6 @@
+import { mocked } from '@atombrenner/jest-ts-utils'
 import { render, screen, waitFor } from '@testing-library/preact'
 import { h } from 'preact'
-import { mocked } from '../jest-utils'
 import { App } from './app'
 import { loadPhotos } from './backend'
 

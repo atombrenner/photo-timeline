@@ -21,6 +21,7 @@
     "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
   },
   "dependencies": {
+    "@atombrenner/jest-ts-utils": "^0.1.0",
     "@koa/cors": "^3.1.0",
     "date-fns": "^2.21.1",
     "exif-reader": "^1.0.3",
