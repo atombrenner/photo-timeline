@@ -1,5 +1,5 @@
-import { makeFileName, MakeFolderName } from './names'
 import { join, extname } from 'path'
+import { makeFileName, MakeFolderName } from './names'
 import type { ReadCreationDate } from './read'
 
 export interface MediaFile {
@@ -81,7 +81,7 @@ export function calcMoveCommands(files: FinalMediaFile[], rootFolder: string) {
       } else {
         commands.push(command)
         if (!blocked.has(command.from))
-          throw Error('attemt to remove an unknown blocked file: ' + command.from)
+          throw Error('attempt to remove an unknown blocked file: ' + command.from)
         blocked.delete(command.from)
       }
     }
