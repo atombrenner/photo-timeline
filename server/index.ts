@@ -18,7 +18,7 @@ app.use(async (ctx, next) => {
     deletePhoto(path)
     ctx.body = 'OK'
   } else if (ctx.method === 'POST') {
-    rotatePhoto(path, ctx.request.body.rotation ?? 0)
+    rotatePhoto(path, ctx.request.body)
     ctx.body = 'OK'
   } else {
     await next()
@@ -28,7 +28,8 @@ app.use(serveStatic(photos, { maxAge: 5 * 60 * 1000 }))
 app.use(serveStatic(__dirname))
 app.listen(9000)
 
-function rotatePhoto(path: string, rotation: number) {
+function rotatePhoto(path: string, body: any) {
+  const rotation = body.rotation ?? 0
   console.log('rotate', path, rotation)
   return appendFile(join(photos, 'rotated.txt'), `${path}\n`)
 }
