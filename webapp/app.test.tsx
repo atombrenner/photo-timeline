@@ -1,3 +1,6 @@
+/* jest-environment needs multiline comment
+  @jest-environment jsdom
+*/
 import { mocked } from '@atombrenner/jest-ts-utils'
 import { render, screen, waitFor } from '@testing-library/preact'
 import { h } from 'preact'
