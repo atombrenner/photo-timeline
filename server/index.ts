@@ -26,6 +26,10 @@ app.use(async (ctx, next) => {
 })
 app.use(serveStatic(photos, { maxAge: 5 * 60 * 1000 }))
 app.use(serveStatic(__dirname))
+app.onerror = (err: Error) => {
+  // ignore ECONNRESET errors that happen if browser cancels download, e.g. when skipping fast through photos
+  if (!err.message.includes('ECONNRESET')) console.error(err)
+}
 app.listen(9000)
 
 function rotatePhoto(path: string, body: any) {
