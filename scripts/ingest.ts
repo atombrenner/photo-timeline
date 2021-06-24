@@ -25,14 +25,23 @@ async function readVideos(folder: string) {
   return await readMediaFiles(files, readVideoCreationDate, makeVideoFolderName)
 }
 
+export async function removeEmptyFolder(folder: string): Promise<void> {
+  console.log(`remove ${folder}`)
+  await remove(folder)
+}
+
+export async function moveFile(from: string, to: string): Promise<void> {
+  console.log(`move ${from} -> ${to}`)
+  await move(from, to, { overwrite: false })
+}
+
 /** remove all folders without mediafiles in folder */
 export async function removeFoldersWithoutMediaFiles(folder: string) {
   const folders = await readFolders(folder)
   await Promise.all(folders.map(removeFoldersWithoutMediaFiles))
   const entries = await readFiles(folder, MediaPattern)
   if (entries.length === 0) {
-    console.log(`remove ${folder}`)
-    await remove(folder)
+    await removeEmptyFolder(folder)
   }
 }
 
@@ -48,8 +57,7 @@ async function ingestMedia(from: string, rootFolder: string, readMediaFiles: Rea
       const mergedFiles = mergeFilesInFolder(files, filesInTargetFolder)
       assertAllFilesHaveSameFolder(mergedFiles)
       for (const { from, to } of calcMoveCommands(mergedFiles, rootFolder)) {
-        console.log(`move ${from} -> ${to}`)
-        await move(from, to)
+        await moveFile(from, to)
       }
     }),
   )

@@ -1,5 +1,6 @@
-import { mkdtempSync, mkdirs, existsSync, writeFile } from 'fs-extra'
-import { removeFoldersWithoutMediaFiles } from './ingest'
+import { mkdtempSync, mkdirs, existsSync, writeFile, move, writeFileSync } from 'fs-extra'
+import { join } from 'path'
+import { removeFoldersWithoutMediaFiles, moveFile } from './ingest'
 
 const log = console.log
 
@@ -31,5 +32,27 @@ describe('removeFoldersWithoutMediaFiles', () => {
     await removeFoldersWithoutMediaFiles(tmp)
 
     expect(existsSync(tmp)).toBeTruthy()
+  })
+})
+
+describe('files must not be overwritten on move', () => {
+  test('fs-extra move should not overwrite an existing file', async () => {
+    const tmp = mkdtempSync('/tmp/move')
+    const srcFile = join(tmp, 'src')
+    const dstFile = join(tmp, 'dst')
+    writeFileSync(srcFile, 'source content')
+    writeFileSync(dstFile, 'destination content')
+
+    expect(move(srcFile, dstFile)).rejects.toThrowError('dest already exists')
+  })
+
+  test('moveFile must not overwrite an existing file', async () => {
+    const tmp = mkdtempSync('/tmp/move')
+    const srcFile = join(tmp, 'src')
+    const dstFile = join(tmp, 'dst')
+    writeFileSync(srcFile, 'source content')
+    writeFileSync(dstFile, 'destination content')
+
+    expect(moveFile(srcFile, dstFile)).rejects.toThrowError('dest already exists')
   })
 })
