@@ -62,9 +62,9 @@ export function App() {
   const currentPhoto = photos[current]
   const currentRotation = rotations[photos[current]] || 0
 
-  const ref = useRef<HTMLDivElement>()
+  const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    ref.current.focus()
+    ref.current?.focus()
     loadPhotos().then((photos) => {
       setPhotos(photos)
       setCurrent(start(photos))
