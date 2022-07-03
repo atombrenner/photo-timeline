@@ -52,7 +52,7 @@ MyMedia
 
 - Connect a camera or phone with your computer, mount the DCIM folder
 - `npm run ingest <path_to_DCIM>`
-- `npm run reindex` reorganize alle media files (e.g. after manual deletions or other manipulations)
+- `npm run reindex` reorganize all media files (e.g. after manual deletions or other manipulations)
 
 ## Development
 

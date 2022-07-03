@@ -41,7 +41,7 @@ function rotatePhoto(path: string, body: any) {
 async function deletePhoto(path: string) {
   move(join(photos, path), join(photos, '_deleted_', basename(path)))
   const indexFile = join(photos, 'index.json')
-  const itemToBeDeleted = path.substr(1) // remove leading slash
+  const itemToBeDeleted = path.substring(1) // remove leading slash
   const index: string[] = await readJson(indexFile)
   const indexWithPhotoRemoved = index.filter((item) => item !== itemToBeDeleted)
   await writeJson(indexFile, indexWithPhotoRemoved)

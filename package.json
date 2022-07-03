@@ -16,7 +16,7 @@
     "--scripts--": "",
     "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
     "ingest:camera": "ts-node -T -P scripts/tsconfig.json scripts/ingest /run/media/christian/9016-4EF8/DCIM/",
-    "ingest:handy": "ts-node -T -P scripts/tsconfig.json scripts/ingest /home/christian/Data/Handy",
+    "ingest:handy": "ts-node -T -P scripts/tsconfig.json scripts/ingest /home/christian/Data/import/Camera",
     "reindex": "ts-node -T -P scripts/tsconfig.json scripts/ingest reindex",
     "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
     "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
