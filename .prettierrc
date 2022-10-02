@@ -5,6 +5,5 @@
   "useTabs": false,
   "semi": false,
   "singleQuote": true,
-  "trailingComma": "all",
-  "importOrder": ["^\\.(?!.*css$)", "^\\..*css$"]
+  "trailingComma": "all"
 }

@@ -16,7 +16,7 @@ async function main() {
 
     const jpegSize = Math.round(statSync(jpeg).size / 1024)
 
-    await sharp(jpeg).avif({ quality: 80, speed: 3 }).withMetadata().toFile(avif)
+    await sharp(jpeg).avif({ quality: 80 }).withMetadata().toFile(avif)
 
     const avifSize = Math.round(statSync(avif).size / 1024)
 
