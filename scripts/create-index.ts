@@ -34,7 +34,7 @@ export async function createIndex(root: string, pattern: RegExp) {
 
   const redundantPrefix = root.length + 1
   const files = rawFiles
-    .map((f) => f.substr(redundantPrefix))
+    .map((f) => f.substring(redundantPrefix))
     .filter((f) => /^\d{4}/.test(f))
     .sort()
 

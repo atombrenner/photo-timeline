@@ -3,4 +3,4 @@ import 'preact/devtools'
 import { App } from './app.jsx'
 import './index.css'
 
-render(<App />, document.getElementById('root')!)
+render(<App />, document.getElementById('root') as HTMLElement)

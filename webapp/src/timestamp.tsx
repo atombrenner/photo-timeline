@@ -10,5 +10,5 @@ export const Timestamp = ({ photo }: TimestampProps) => {
 }
 
 function getDate(path: string) {
-  return path.substr(path.lastIndexOf('/') + 1, 14)
+  return path.substring(path.lastIndexOf('/') + 1, 14)
 }

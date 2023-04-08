@@ -1,7 +1,5 @@
 # Photo Timeline
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
-
 A minimal web app to view and browse photos organized on a timeline.
 Import photos and videos into an organized folder structure with a simple command-line tool.
 Sync organized files with cloud storage (AWS S3).
@@ -10,13 +8,13 @@ Sync organized files with cloud storage (AWS S3).
 
 ## Motivation
 
-Many years ago, my digital photo library became a mess. I got tired of manually organize photos into folders or albums and needed an automated task that transfers media files from my camera to my photo folder on my pc. The simplest scheme I could imagine was to order by creation time and then group by month. This system was relatively easy to implement and worked for me. Vanilla OS tools were sufficient to browse and view all my photos. From then on, I implemented the same tool every few years with a different language and framework, either command line only or as old school windows desktop apps, starting with C#, Python, Ruby, Scala, and now Typescript.
-With Windows Photo Gallery discontinued, I could not found a simple, free and usable photo video viewer anymore, so I build one myself with modern (2021) web technologies.
+Many years ago, my digital photo library became a mess. I got tired of manually organizing photos into folders or albums and needed an automated task that transfers media files from my camera to my photo folder on my pc. The simplest scheme I could imagine was to order by creation time and then group by month. This system was relatively easy to implement and worked for me. Vanilla OS tools were sufficient to browse and view all my photos. From then on, I implemented the same tool every few years with a different language and framework, either command line only or as old-school Windows desktop apps, starting with C#, Python, Ruby, Scala, and now Typescript.
+With Windows Photo Gallery discontinued, I could not find a simple, free and usable photo video viewer anymore, so I build one myself with web technologies.
 I intend to maintain this project for a long time as I believe that web technology (browsers + typescript + node) is mature and stable enough to last for the next decades.
 
 ## Workflow and file structure
 
-Files are grouped by years and month into this folder structure:
+Files are grouped by year and month into this folder structure:
 
 ```
 Photos/  <-- the root of all your photos
@@ -44,7 +42,7 @@ MyMedia
 
 ## Setup
 
-- install node > 14
+- install node > 18
 - git clone this repository
 - run `npm i` to install dependencies
 
@@ -58,7 +56,7 @@ MyMedia
 
 ### npm start
 
-Runs the app in the development mode.
+Runs the app in development mode.
 
 ### npm test
 
