@@ -1,10 +1,10 @@
 /* jest-environment needs multiline comment
   @jest-environment jsdom
 */
-import { render, screen, waitFor } from '@testing-library/preact'
 import { h } from 'preact'
 import { App } from './app'
 import { loadPhotos } from './backend'
+import { render, screen, waitFor } from '@testing-library/preact'
 
 jest.mock('./backend')
 jest
