@@ -1,6 +1,7 @@
 import { fstat, statSync, readFileSync, removeSync } from 'fs-extra'
 import { basename, dirname, join } from 'path'
-import { readPhotoCreationDate, readFiles, readVideoCreationDate } from './read'
+import { readFiles } from './read'
+import { readPhotoCreationDate, readVideoCreationDate } from './read-creation-date'
 import { format, parseISO, addSeconds, addHours } from 'date-fns'
 
 const pattern = /\.jpe?g$/i

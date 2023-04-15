@@ -1,7 +1,7 @@
 import { statSync } from 'fs-extra'
 import { join, basename } from 'path'
 import sharp from 'sharp'
-import { readPhotoCreationDate } from './read'
+import { readPhotoCreationDate } from './read-creation-date'
 
 const jpegs = [
   '/home/christian/Data/MyMedia/Photos/2016/08 August/2016-08-14 032.jpg',

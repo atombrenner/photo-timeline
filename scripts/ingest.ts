@@ -11,7 +11,8 @@ import {
   assertAllFilesHaveSameFolder,
   MediaFile,
 } from './organize'
-import { readPhotoCreationDate, readVideoCreationDate, readFiles, readFolders } from './read'
+import { readFiles, readFolders } from './read'
+import { readPhotoCreationDate, readVideoCreationDate } from './read-creation-date'
 
 type ReadMediaFiles = (folder: string) => Promise<MediaFile[]>
 
