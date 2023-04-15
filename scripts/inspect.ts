@@ -1,6 +1,7 @@
+import { basename } from 'node:path'
+import { PhotoPattern, PhotoRoot } from './config'
 import { readFiles } from './read'
 import { readPhotoCreationDate } from './read-creation-date'
-import { PhotoPattern, PhotoRoot } from './config'
 
 async function checkCreationDateUniqueness() {
   const photos = new Map<number, string>()
@@ -16,10 +17,13 @@ async function checkCreationDateUniqueness() {
       const date = await readPhotoCreationDate(file)
       if (photos.get(date)) {
         duplicates.push(
-          `${file} has the same timestamp as ${photos.get(date)}, ${new Date(date).toISOString()}`,
+          `${new Date(date).toISOString()}: ${basename(file)} has the same timestamp as ${basename(
+            photos.get(date)!,
+          )}`,
         )
+      } else {
+        photos.set(date, file)
       }
-      photos.set(date, file)
     }
   }
 
