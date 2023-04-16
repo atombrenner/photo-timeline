@@ -1,3 +1,4 @@
+#!/usr/bin/env -S npx ts-node -T
 import { basename } from 'node:path'
 import { PhotoPattern, PhotoRoot } from './config'
 import { readFiles } from './read'
