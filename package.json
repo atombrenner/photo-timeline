@@ -2,6 +2,9 @@
   "name": "photo-timeline",
   "repository": "",
   "license": "GPL-3.0-or-later",
+  "bin": {
+    "ingest": "./bin/ingest.ts"
+  },
   "scripts": {
     "start": "cd webapp && vite",
     "build:webapp": "cd webapp && vite build",
