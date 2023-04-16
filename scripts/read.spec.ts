@@ -23,7 +23,7 @@ describe('readFolders', () => {
     mkdirSync(join(tmp, 'c'), { recursive: true })
 
     const folders = await readFolders(tmp)
-    expect(folders.sort()).toEqual(['a', 'b', 'c'].map((f) => join(tmp, f)))
+    expect(folders).toEqual(['a', 'b', 'c'].map((f) => join(tmp, f)))
   })
 })
 
@@ -43,6 +43,6 @@ describe('readFiles', () => {
     mkdirSync(join(tmp, 'a', 'bb', 'bbb'), { recursive: true }) // empty leave folder
 
     const files = await readFiles(tmp, /.*\.jpeg$/)
-    expect(expectedFiles.sort()).toEqual(files.sort())
+    expect(files).toEqual(expectedFiles.sort())
   })
 })

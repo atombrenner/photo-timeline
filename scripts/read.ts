@@ -23,7 +23,7 @@ export async function readFiles(folder: string, pattern: RegExp): Promise<string
   }
 
   await innerReadFiles(folder)
-  return files
+  return files.sort()
 }
 
 // read all folders in folder */
@@ -32,4 +32,5 @@ export async function readFolders(folder: string): Promise<string[]> {
   return entries
     .filter((e) => e.isDirectory() && e.name[0] !== '.')
     .map((e) => join(folder, e.name))
+    .sort()
 }
