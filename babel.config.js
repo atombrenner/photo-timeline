@@ -3,6 +3,6 @@ module.exports = {
   presets: [
     ['@babel/preset-env', { targets: { node: 'current' } }],
     '@babel/preset-typescript',
-    ['@babel/preset-react', { importSource: 'preact', runtime: 'automatic' }],
+    // ['@babel/preset-react', { importSource: 'preact', runtime: 'automatic' }],
   ],
 }
