@@ -24,25 +24,40 @@ describe.skip('one million media files', () => {
   it('should give a feeling for performance', () => {
     const min = Date.parse('2000')
     const max = Date.parse('2050')
-    const array: number[] = []
+    // const array = new Array(1_000_000 + 5)
+    const array = new Float64Array(1_000_000 + 5) // a Float64Array is ten times faster than a normal array
     for (let i = 0; i < 1_000_000; ++i) {
-      array.push(Math.random() * (max - min) + min)
+      array[i] = Math.random() * (max - min) + min
     }
     console.time('sort')
     array.sort()
     console.timeEnd('sort')
-    array.push(max + 1)
-    array.push(max + 2)
-    array.push(max + 3)
-    array.push(max + 4)
-    array.push(max + 5)
+    array[1_000_000] = max / 2 + 1
+    array[1_000_001] = max / 2 + 1
+    array[1_000_002] = max / 2 + 1
+    array[1_000_003] = max / 2 + 1
+    array[1_000_004] = max / 2 + 1
+    //  array.push(max + 1)
+    //  array.push(max + 2)
+    //  array.push(max + 3)
+    //  array.push(max + 4)
+    //  array.push(max + 5)
     console.time('appendSort')
     array.sort()
-    console.timeEnd('appendSort')
-    console.time('Math.floor')
-    for (let i = 0; i < array.length; ++i) {
-      array[i] = Math.floor(array[i])
+    console.timeEnd('appendSort') // append sort (new entries at the end is 4 times faster than at the beginning)
+    console.time('stringify')
+    JSON.stringify(array)
+    console.timeEnd('stringify')
+  })
+})
+
+describe('encode timestamp and sequence in one float64 number', () => {
+  it.only('should work for the year 2100 with three-digi precision', () => {
+    const timestamp = Date.parse('2100')
+    for (let i = 1; i < 1000; ++i) {
+      const parsed = JSON.parse(JSON.stringify(timestamp + i / 1000))
+      const seq = parsed.toFixed(3).split('.')[1]
+      expect(seq).toEqual(i.toString().padStart(3, '0'))
     }
-    console.timeEnd('Math.floor')
   })
 })
