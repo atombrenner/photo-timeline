@@ -1,16 +1,4 @@
-type Timestamp = number // compressed timestamp
-
-const precision = 60_000 // minute
-const offset = Date.parse('2000')
-
-export const compressTimestamp = (date: Date | number) => Math.floor((+date - offset) / precision)
-export const decompressTimestamp = (ts: Timestamp) => ts * precision + offset
-
-export const makeFileName = (ts: Timestamp): string => {
-  const date = new Date(ts * 3600_000)
-  const seq = ts.toString(10).split('.')[1] ?? ''
-  return date.toISOString().substring(0, 12).replace('T', '-') + seq
-}
+type Timestamp = number
 
 type MediaFile2 = {
   path: string
@@ -22,29 +10,31 @@ export type Timestamped = {
   ts: number
 }
 
-// preconditions
-// - sorted by timestamps
-// - timestamps are integers (fractions removed)
+const toSeconds = (ts: number) => Math.trunc(ts / 1000)
+
+// deduplicates a sorted list of timestamps by adding a
+// sequence number as a fraction
+// 1. remove existing fractions
+// 2. sort
+// 3. deduplicate for a second precision, by adding a sequence number as a fraction
 // for performance reasons the elements of the array are modified
 export const deduplicateTimestamps = (items: Timestamped[]) => {
-  for (let i = 0; i < items.length - 1; ) {
-    const start = i
-    do ++i
-    while (i < items.length && items[i].ts === items[start].ts)
-    const count = i - start
+  for (let i = items.length; i-- > 0; ) items[i].ts = Math.trunc(items[i].ts)
+  items.sort((a, b) => a.ts - b.ts)
+
+  for (let i = items.length - 1; i > 0; ) {
+    const stop = i
+    const value = toSeconds(items[stop].ts)
+    //console.log(value, i, items[i])
+    do i--
+    while (i >= 0 && toSeconds(items[i].ts) === value)
+    const count = stop - i
     if (count > 1) {
-      const divisor = getDivisor(count)
-      for (let j = 0; j < count; ) {
-        items[start + j].ts += ++j / divisor
+      if (count > 99) throw Error('too many duplicates')
+      // add sequence number j as a two digit fraction
+      for (let j = 1; j <= count; ++j) {
+        items[i + j].ts += j / 100
       }
     }
   }
-}
-
-const getDivisor = (count: number) => {
-  // return 10 ** Math.ceil(Math.log(count))
-  if (count < 10) return 10
-  if (count < 100) return 100
-  if (count < 1000) return 1000
-  throw Error('too many duplicates')
 }

@@ -1,49 +1,47 @@
-import { compressTimestamp, decompressTimestamp, deduplicateTimestamps } from './ordering'
+import { deduplicateTimestamps } from './ordering'
 
-const makeItems = (...timestamps: number[]) => timestamps.map((ts) => ({ ts }))
+const makeItems = (...timestamps: number[]) => timestamps.map((ts, id) => ({ ts, id }))
 
-describe('deduplicateTimestamps', () => {
+describe('deduplicateTimestamps // organizeIndex?', () => {
   it('should not modify if no duplicates present', () => {
-    const timestamps = makeItems(1, 2, 3.1, 3.2, 4)
-    deduplicateTimestamps(timestamps)
-
-    expect(timestamps).toEqual(makeItems(1, 2, 3.1, 3.2, 4))
+    const items = makeItems(1000, 2000, 3000, 4000)
+    deduplicateTimestamps(items)
+    expect(items).toEqual(makeItems(1000, 2000, 3000, 4000))
   })
 
-  it('should add fractions to duplicates', () => {
-    const timestamps = makeItems(1, 2, 3, 3, 4, 4)
-    deduplicateTimestamps(timestamps)
-
-    expect(timestamps).toEqual(makeItems(1, 2, 3.1, 3.2, 4.1, 4.2))
+  it('should add sequence number as fraction to duplicates', () => {
+    const items = makeItems(1000, 2000, 3100.5, 3200.8, 3500.01, 4000, 4999, 5000)
+    deduplicateTimestamps(items)
+    expect(items).toEqual(makeItems(1000, 2000, 3100.01, 3200.02, 3500.03, 4000.01, 4999.02, 5000))
   })
 
-  it('should add fractions to duplicates with the last item being unique', () => {
-    const timestamps = makeItems(1, 1, 2, 3, 4, 4, 5)
-    deduplicateTimestamps(timestamps)
-
-    expect(timestamps).toEqual(makeItems(1.1, 1.2, 2, 3, 4.1, 4.2, 5))
+  it('should add fractions to duplicates with the last and first item being unique', () => {
+    const items = makeItems(1000, 1000, 2000, 3000, 4000, 5000, 5000)
+    deduplicateTimestamps(items)
+    expect(items).toEqual(makeItems(1000.01, 1000.02, 2000, 3000, 4000, 5000.01, 5000.02))
   })
 
-  it('should add one decimal place for 9 duplicates ', () => {
-    const timestamps = makeItems(3, 3, 3, 3, 3, 3, 3, 3, 3)
-    deduplicateTimestamps(timestamps)
-
-    expect(timestamps).toEqual(makeItems(3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9))
+  it('should sort by timestamp', () => {
+    const items = makeItems(5000, 4000, 3000, 2000, 1000)
+    deduplicateTimestamps(items)
+    expect(items).toEqual([
+      { ts: 1000, id: 4 },
+      { ts: 2000, id: 3 },
+      { ts: 3000, id: 2 },
+      { ts: 4000, id: 1 },
+      { ts: 5000, id: 0 },
+    ])
   })
 
-  it('should add two decimal place for 10 duplicates ', () => {
-    const timestamps = makeItems(3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
-    deduplicateTimestamps(timestamps)
-
-    expect(timestamps).toEqual(makeItems(3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.1))
-  })
-})
-
-describe('timestamp compression', () => {
-  it('should compress and decompress', () => {
-    const compressed = compressTimestamp(Date.parse('2010-01-01'))
-    expect(compressed).toEqual(5260320)
-    const decompressed = decompressTimestamp(compressed)
-    expect(decompressed).toEqual(Date.parse('2010-01-01'))
+  it('should stable sort items by timestamp', () => {
+    const items = makeItems(1000, 2000, 3000, 2000, 2000)
+    deduplicateTimestamps(items)
+    expect(items).toEqual([
+      { ts: 1000, id: 0 },
+      { ts: 2000.01, id: 1 },
+      { ts: 2000.02, id: 3 },
+      { ts: 2000.03, id: 4 },
+      { ts: 3000, id: 2 },
+    ])
   })
 })

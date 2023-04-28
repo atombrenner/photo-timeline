@@ -52,7 +52,7 @@ describe.skip('one million media files', () => {
 })
 
 describe('encode timestamp and sequence in one float64 number', () => {
-  it.only('should work for the year 2100 with three-digi precision', () => {
+  it('should be numerical exakt for the year 2100 with three-digit fraction', () => {
     const timestamp = Date.parse('2100')
     for (let i = 1; i < 1000; ++i) {
       const parsed = JSON.parse(JSON.stringify(timestamp + i / 1000))
