@@ -1,29 +1,28 @@
 #!/usr/bin/env -S npx ts-node -T
-import { basename } from 'node:path'
+import { format } from 'date-fns'
 import { PhotoPattern, PhotoRoot } from './config'
 import { readFiles } from './read'
 import { readPhotoCreationDate } from './read-creation-date'
 
+const truncSecond = (ts: number) => Math.trunc(ts / 1000) * 1000
+
 async function checkCreationDateUniqueness() {
-  const photos = new Map<number, string>()
+  const photos = new Map<number, number>()
   const files = await readFiles(PhotoRoot, PhotoPattern)
+  console.log(`inspecting ${files.length} files`)
   const chunks = 8
   const chunkSize = Math.round(files.length / chunks)
-  const duplicates: string[] = []
 
   const processChunk = async (start: number) => {
     const stop = Math.min(start + chunkSize, files.length)
     for (let i = start; i < stop; ++i) {
       const file = files[i]
-      const date = await readPhotoCreationDate(file)
-      if (photos.get(date)) {
-        duplicates.push(
-          `${new Date(date).toISOString()}: ${basename(file)} has the same timestamp as ${basename(
-            photos.get(date)!,
-          )}`,
-        )
+      const ts = truncSecond(await readPhotoCreationDate(file))
+      const count = photos.get(ts)
+      if (count) {
+        photos.set(ts, count + 1)
       } else {
-        photos.set(date, file)
+        photos.set(ts, 1)
       }
     }
   }
@@ -33,9 +32,15 @@ async function checkCreationDateUniqueness() {
     jobs.push(processChunk(i * chunkSize))
   }
   await Promise.all(jobs)
-  console.log(duplicates.sort().join('\n'))
-  console.log(files.length, photos.size)
-  console.log('done')
+
+  let duplicateCount = 0
+  for (const [ts, count] of Array.from(photos.entries()).sort((a, b) => a[0] - b[0])) {
+    if (count > 1) {
+      console.log(`${count} duplicates for ${format(ts, 'yyyyMMdd_HHmmss') + '_00.jpg'}`)
+      ++duplicateCount
+    }
+  }
+  console.log(`found ${duplicateCount} timestamps with more than one photo`)
 }
 
 checkCreationDateUniqueness().catch(console.error)

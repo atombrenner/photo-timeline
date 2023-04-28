@@ -1,20 +1,14 @@
 import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
 
-const localized = { locale: de }
+const localized = { locale: enUS }
 
-export type MakeFolderName = (created: number) => string
+export type MakeFolderName = (date: number) => string
 
-export function makePhotoFolderName(created: number) {
-  return format(created, 'yyyy/MM MMMM', localized)
-}
+export const makePhotoFolderName: MakeFolderName = (date) => format(date, 'yyyy/MM-MMMM', localized)
+export const makeVideoFolderName: MakeFolderName = (date) => format(date, 'yyyy', localized)
 
-export function makeVideoFolderName(created: number) {
-  return format(created, 'yyyy', localized)
-}
-
-// no time information will be encoded in filename
-export function makeFileName(created: number, index: number, type: string) {
-  const number = (index + 1).toString().padStart(3, '0')
-  return format(created, 'yyyy-MM-dd', localized) + ` ${number}` + type.toLowerCase()
+export const makeFileName = (date: number, ext: string): string => {
+  const seq = date.toFixed(2).split('.')[1]
+  return format(date, 'yyyyMMdd-HHmmss') + (seq === '00' ? '' : '-' + seq) + ext.toLowerCase()
 }

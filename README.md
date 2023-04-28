@@ -17,7 +17,7 @@ I intend to maintain this project for a long time as I believe that web technolo
 All photos are stored in a single root folder ("Photos").
 They are grouped by year and month into subfolders.
 A normal file manager should be sufficient for browsing photos.
-The filename of each photo is derived from it's timestamp (DateTimeOriginal).
+The filename of each photo is derived from its timestamp (DateTimeOriginal).
 and it must be unique in the whole file structure, not only in one subfolder.
 Sorting by filename should have the same effect as sorting by timestamp.
 It is not uncommon to have multiple photos with the same timestamp, e.g.
@@ -36,14 +36,16 @@ This was simple to implement. But it had two drawbacks:
 
 1. in one month, I took more than 1000 photos, breaking numbering
 2. deleting or adding photos later (e.g. second camera)
-   lead to a lot of renaming operations, which leads to a lot
-   of unnecessary traffic (and time) in cloud backups
+   lead to a lot of renaming operations, which leads to
+   unnecessary traffic (costs) in cloud backups
 
-To tackle this issue, the filename now also contains the time of the day.
-A sequence number is only appended if there are several photos
-with the same timestamp.
-The internal order is still based on the original photo timestamp.
-In case of duplicates, the order of ingestion decides.
+To tackle this issue, the filename now contains the full timestamp including seconds.
+A sequence number is only appended if there are several photos in the same second.
+The internal order is still based on the original photo timestamp with millisecond
+precision. In case of duplicates, the order of ingestion decides.
+I did not include the millisecond in the filename as it does not solve
+the duplicate problem. It can still happen to have duplicate timestamps with millisecond
+accuracy, because of multiple cameras or cameras not supporting milliseconds.
 
 ```
 Photos/  <-- the root of all your photos
@@ -51,9 +53,9 @@ Photos/  <-- the root of all your photos
 │   ├── 01_January
 │   :
 │   ├── 10_October
-│   │   ├── 2015-10-01_12-53.jpg      <-- only one photo
-│   │   ├── 2015-10-02_13-55_001.jpg  <-- photos in the same second
-│   │   ├── 2015-10-02_13-55_002.jpg  <-- second photo
+│   │   ├── 20151001-125510.jpg     <-- only one photo
+│   │   ├── 20151002-135512-01.jpg  <-- first photos in the same second
+│   │   ├── 20151002-135512-02.jpg  <-- second photo in the same second
 │   :   :
 ├── 2016
 |   ├── 01_January
@@ -70,9 +72,9 @@ MyMedia
 
 ## Index Implementation Details
 
-- for performance reasons, all photos are stored in a json index file
-- we only need to read the index to browse photos, no reason to traverse
-  a folder structure and list files
+- for performance reasons, all photos are stored in a JSON index file
+  so that we only need to read the index file to browse photos, and don't
+  need to traverse the filesystem
 - the index must fit in memory for at least one million photos
 - the index must contain the original photo timestamp with millisecond precision
 - the index should contain the sequence number if necessary to deduplicate photos
@@ -81,9 +83,12 @@ MyMedia
 - a float64 number is precise enough to have timestamps to the year 2100 with
   three decimal places for a sequence number
 - the array is sorted in ascending order
-- 1 million photos would be roughly 14MB of json and 8MB in memory
-- one could try to compress the timestamp on serialization, but it would just
-  increase complexity and only save 5 bytes per photo in json
+- 1 million photos would be roughly 14MB of JSON and 8MB in memory
+- compressing the timestamp on serialization (e.g use base64 strings)
+  would just increase complexity and only save ~4MB
+- Decision: the index is a sorted array of float64 values, where the
+  integer part is a UNIX timestamp and the fraction part is the sequence number.
+  The precision is good enough for at least the next 100 years
 
 ## Setup
 

@@ -1,33 +1,31 @@
 import { makeFileName, makePhotoFolderName, makeVideoFolderName } from './names'
 
-describe('makeFolderName', () => {
+describe('names', () => {
   it.each([
-    [new Date('2000-01-01'), '2000/01 Januar'],
-    [new Date('2000-03-01'), '2000/03 März'],
-    [new Date('2000-12-31'), '2000/12 Dezember'],
-  ])('photo creationDate %s should be formated as %s', (creationDate, expected) => {
-    expect(makePhotoFolderName(+creationDate)).toBe(expected)
+    ['2000-01-01', '2000/01-January'],
+    ['2000-03-01', '2000/03-March'],
+    ['2000-12-31', '2000/12-December'],
+  ])('photo folder for timestamp %s should be "%s"', (date, expected) => {
+    expect(makePhotoFolderName(Date.parse(date))).toBe(expected)
   })
 
   it.each([
-    [new Date('2000-01-01'), '2000'],
-    [new Date('2001-03-01'), '2001'],
-    [new Date('2002-12-31'), '2002'],
-  ])('video creationDate %s should be formated as %s', (creationDate, expected) => {
-    expect(makeVideoFolderName(+creationDate)).toBe(expected)
+    ['2000-01-01', '2000'],
+    ['2001-03-01', '2001'],
+    ['2002-12-31', '2002'],
+  ])('video folder for timestamp %s should be "%s"', (date, expected) => {
+    expect(makeVideoFolderName(Date.parse(date))).toBe(expected)
   })
-})
 
-describe('makeFileName', () => {
   it.each([
-    [new Date('2000-01-01'), 0, '.JPG', '2000-01-01 001.jpg'],
-    [new Date('2001-03-01'), 10, '.jpg', '2001-03-01 011.jpg'],
-    [new Date('2002-06-15'), 10, '.MP4', '2002-06-15 011.mp4'],
-    [new Date('2003-12-31'), 998, '.ext', '2003-12-31 999.ext'],
+    ['2000-01-01T02:01:01.100', 0, '.JPG', '20000101-020101.jpg'],
+    ['2001-03-01T12:02:00.999', 1, '.jpg', '20010301-120200-01.jpg'],
+    ['2002-06-15T13:10:20', 10, '.MP4', '20020615-131020-10.mp4'],
+    ['2003-12-31T20:50:55', 99, '.mpeg', '20031231-205055-99.mpeg'],
   ])(
-    'creationDate %s with index %i should be formated as %s',
-    (creationDate, index, type, expected) => {
-      expect(makeFileName(+creationDate, index, type)).toBe(expected)
+    'filename for timestamp %s with sequence number %i and extension %s should be "%s"',
+    (ts, seq, type, expected) => {
+      expect(makeFileName(Date.parse(ts) + seq / 100, type)).toBe(expected)
     },
   )
 })
