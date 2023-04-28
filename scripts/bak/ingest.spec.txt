@@ -1,5 +1,7 @@
-import { mkdtempSync, mkdirs, existsSync, writeFile, move, writeFileSync } from 'fs-extra'
-import { join } from 'path'
+import { mkdirSync, writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
 import { removeFoldersWithoutMediaFiles, moveFile } from './ingest'
 
 const log = console.log
@@ -12,12 +14,14 @@ afterAll(() => {
   console.log = log
 })
 
+const recursive = { recursive: true }
+
 describe('removeFoldersWithoutMediaFiles', () => {
   const tmp = mkdtempSync('/tmp/DCIM')
 
   it('should remove recursively all empty folders', async () => {
-    await mkdirs(tmp + '/bli/bla/blub')
-    await mkdirs(tmp + '/hulle/bulle')
+    mkdirSync(tmp + '/bli/bla/blub', recursive)
+    mkdirSync(tmp + '/hulle/bulle', recursive)
 
     await removeFoldersWithoutMediaFiles(tmp)
 
@@ -25,9 +29,9 @@ describe('removeFoldersWithoutMediaFiles', () => {
   })
 
   it('should not remove folders with photos', async () => {
-    await mkdirs(tmp + '/bli/bla/blub')
-    await mkdirs(tmp + '/hulle/bulle')
-    await writeFile(tmp + '/hulle/photo.jpg', 'data')
+    mkdirSync(tmp + '/bli/bla/blub', recursive)
+    mkdirSync(tmp + '/hulle/bulle', recursive)
+    writeFileSync(tmp + '/hulle/photo.jpg', 'data')
 
     await removeFoldersWithoutMediaFiles(tmp)
 
@@ -36,16 +40,6 @@ describe('removeFoldersWithoutMediaFiles', () => {
 })
 
 describe('files must not be overwritten on move', () => {
-  test('fs-extra move should not overwrite an existing file', async () => {
-    const tmp = mkdtempSync('/tmp/move')
-    const srcFile = join(tmp, 'src')
-    const dstFile = join(tmp, 'dst')
-    writeFileSync(srcFile, 'source content')
-    writeFileSync(dstFile, 'destination content')
-
-    expect(move(srcFile, dstFile)).rejects.toThrowError('dest already exists')
-  })
-
   test('moveFile must not overwrite an existing file', async () => {
     const tmp = mkdtempSync('/tmp/move')
     const srcFile = join(tmp, 'src')

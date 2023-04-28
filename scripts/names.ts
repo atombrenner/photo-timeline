@@ -1,14 +1,23 @@
 import { format } from 'date-fns'
 import { enUS } from 'date-fns/locale'
+import { join } from 'node:path'
 
 const localized = { locale: enUS }
 
-export type MakeFolderName = (date: number) => string
+export type MakePathName = (timestamp: number) => string
 
-export const makePhotoFolderName: MakeFolderName = (date) => format(date, 'yyyy/MM-MMMM', localized)
-export const makeVideoFolderName: MakeFolderName = (date) => format(date, 'yyyy', localized)
+export const makePhotoPathName = (timestamp: number) =>
+  join(makePhotoFolderName(timestamp), makeFileName(timestamp, '.jpg'))
 
-export const makeFileName = (date: number, ext: string): string => {
-  const seq = date.toFixed(2).split('.')[1]
-  return format(date, 'yyyyMMdd-HHmmss') + (seq === '00' ? '' : '-' + seq) + ext.toLowerCase()
+export const makePhotoFolderName = (timestamp: number) =>
+  format(timestamp, 'yyyy/MM-MMMM', localized)
+
+export const makeVideoPathName = (timestamp: number) =>
+  join(makeVideoFolderName(timestamp), makeFileName(timestamp, '.mp4'))
+
+export const makeVideoFolderName = (timestamp: number) => format(timestamp, 'yyyy')
+
+export const makeFileName = (timestamp: number, ext: string): string => {
+  const seq = timestamp.toFixed(2).split('.')[1]
+  return format(timestamp, 'yyyyMMdd-HHmmss') + (seq === '00' ? '' : '-' + seq) + ext
 }

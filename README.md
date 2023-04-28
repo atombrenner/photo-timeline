@@ -1,8 +1,8 @@
 # Photo Timeline
 
-A minimal web app to view and browse photos organized on a timeline.
-Import photos and videos into an organized folder structure with a simple command-line tool.
-Sync organized files with cloud storage (AWS S3).
+- import photos and videos into an organized folder structure with a simple CLI tool
+- a minimal web app to browse and view photos organized by time.
+- backup organized files with cloud storage (AWS S3)
 
 ![CI Status](https://github.com/atombrenner/photo-timeline/actions/workflows/main.yml/badge.svg?branch=master)
 
@@ -62,7 +62,7 @@ Photos/  <-- the root of all your photos
 :   :
 ```
 
-Videos and Photos are separated into two different root folders, just because I liked it this way.
+Videos and Photos are separated into two different root folders, initially just because I liked it this way. Eventually, it turned out that this enabled a very simple and fast index structure. The key is to be able to generate the full file path just from a 64-bit float timestamp.
 
 ```
 MyMedia
@@ -70,7 +70,38 @@ MyMedia
 ├─── Videos
 ```
 
-## Index Implementation Details
+## Commands
+
+### Ingest
+
+`npx ingest camera`
+`npx ingest ` -- list all implemented sources
+
+### Reindex (Reorganize)
+
+Syncs the existing index.json with existing media files. If files were (re)moved
+or deleted index and filenames will be updated
+
+`npx reindex photos`
+`npx reindex videos`
+`npx reindex photos --folder hullebulle`
+
+## Stats
+
+Analyse existing photos and report some statistics
+
+## Config
+
+Configuration is in [`config.ts`](scripts/config.ts).
+
+## Implementation Details
+
+- if we use `fs-extra` for high-level file operations, e.g. moving files
+  accross file systems, we can also use the more covenient wrapper functions
+- at least on unix, it seems to be fine to have hundred thousands of move
+  operations running in parallel with Promise.all()
+
+### Timestamp based index and filename generation
 
 - for performance reasons, all photos are stored in a JSON index file
   so that we only need to read the index file to browse photos, and don't
@@ -80,6 +111,10 @@ MyMedia
 - the index should contain the sequence number if necessary to deduplicate photos
 - basic idea: index is just an array of numbers, where the integer part is the
   Unix timestamp and the fraction is the sequence number
+  - it is important that the path can be derived from the number,
+    in case we need to move existing files to a new place
+  - this implies that below the media root only one file extension is possible,
+    for example `.jpg` or `.mp4`
 - a float64 number is precise enough to have timestamps to the year 2100 with
   three decimal places for a sequence number
 - the array is sorted in ascending order
@@ -95,12 +130,6 @@ MyMedia
 - install node > 18
 - git clone this repository
 - run `npm i` to install dependencies
-
-## Usage
-
-- Connect a camera or phone with your computer, mount the DCIM folder
-- `npm run ingest <path_to_DCIM>`
-- `npm run reindex` reorganize all media files (e.g. after manual deletions or other manipulations)
 
 ## Development
 
@@ -119,3 +148,35 @@ It correctly bundles Preact in production mode and optimizes the build for the b
 ### npm run deploy
 
 Build and copy the app to ~/Data/MyMedia
+
+# Learnings
+
+## Video Metadata
+
+It's a messs,`ffmpeg -dump` can help,
+
+But the best way is to pick the date from mtime (modified) and encode it in the file name
+=>2020-01-01_12-59-03_001.mp4
+=>when reorganizing, try to detect the pattern and use it as time
+
+ffprobe works for newer formats reliable
+
+## Conversion
+
+.mp4 should be the video container
+
+- `ffmpeg -i input.avi output.mp4` seems to work good enough
+- `ffmpeg -i input.wmv output.mp4` seems to work good enough
+
+The `-metadata creation_time=2019-01-01T12:00:00` can set the time to the generated file
+
+## Tools
+
+- `rdfind somedir` finds duplicates and creates result.txt with findings
+- `rdfind -deleteduplicates true somedir` deletes duplicates
+
+## Avif
+
+quality of 80 saves between 50% and 90% but images have visible differences
+quality of 90 saves between 25% and 80% but images have still visible differences
+compression is very cpu intensive, one image takes 1 to 3 seconds, 4 cores are utilized at 100%

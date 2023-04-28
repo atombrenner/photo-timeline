@@ -1,140 +1,109 @@
-import { makeFileName } from './names'
-import {
-  assertAllFilesHaveSameFolder,
-  calcMoveCommands,
-  FinalMediaFile,
-  MediaFile,
-  mergeFilesInFolder,
-} from './organize'
+import { calcMoveFileOps, organizeByTimestamp } from './organize'
 
-function fakeMediaFile(created: number, number = 0): MediaFile {
-  return {
-    path: `${created}-${number}.jpg`,
-    created,
-    folder: '',
-  }
-}
+const makeItems = (...timestamps: number[]) =>
+  timestamps.map((timestamp, i) => ({ timestamp, path: i.toString() }))
 
-describe.skip('organizeFolder', () => {
-  const files = [fakeMediaFile(100), fakeMediaFile(1), fakeMediaFile(10)]
-  const moreFiles = [fakeMediaFile(1000), fakeMediaFile(3000), fakeMediaFile(2000)]
-
-  it('should sort files', () => {
-    const filesInFolder = mergeFilesInFolder(files, [])
-    expect(filesInFolder.map((f) => f.created)).toEqual([1, 10, 100])
+describe('organizeByTimestamp', () => {
+  it('should not modify if no duplicates present', () => {
+    const items = makeItems(1000, 2000, 3000, 4000)
+    organizeByTimestamp(items)
+    expect(items).toEqual(makeItems(1000, 2000, 3000, 4000))
   })
 
-  it('should concat and sort files', () => {
-    const filesInFolder = mergeFilesInFolder(files, moreFiles)
-    expect(filesInFolder.map((f) => f.created)).toEqual([1, 10, 100, 1000, 2000, 3000])
+  it('should add sequence number as fraction to duplicates', () => {
+    const items = makeItems(1000, 2000, 3100, 3200, 3500, 4000, 4999, 5000)
+    organizeByTimestamp(items)
+    expect(items).toEqual(makeItems(1000, 2000, 3100.01, 3200.02, 3500.03, 4000.01, 4999.02, 5000))
   })
 
-  it('should stable sort files with equal creation date', () => {
+  it('should add fractions to duplicates with the last and first item being unique', () => {
+    const items = makeItems(1000, 1000, 2000, 3000, 4000, 5000, 5000)
+    organizeByTimestamp(items)
+    expect(items).toEqual(makeItems(1000.01, 1000.02, 2000, 3000, 4000, 5000.01, 5000.02))
+  })
+
+  it('should sort by timestamp', () => {
+    const items = makeItems(5000, 4000, 3000, 2000, 1000)
+    organizeByTimestamp(items)
+    expect(items).toEqual([
+      { timestamp: 1000, path: '4' },
+      { timestamp: 2000, path: '3' },
+      { timestamp: 3000, path: '2' },
+      { timestamp: 4000, path: '1' },
+      { timestamp: 5000, path: '0' },
+    ])
+  })
+
+  it('should stable sort items by timestamp', () => {
+    const items = makeItems(1000, 2000, 3000, 2000, 2000)
+    organizeByTimestamp(items)
+    expect(items).toEqual([
+      { timestamp: 1000, path: '0' },
+      { timestamp: 2000.01, path: '1' },
+      { timestamp: 2000.02, path: '3' },
+      { timestamp: 2000.03, path: '4' },
+      { timestamp: 3000, path: '2' },
+    ])
+  })
+})
+
+describe('calcMoveFileOps', () => {
+  const pathFromTimestamp = (timestamp: number) => timestamp.toFixed(2)
+
+  it('should do nothing if current path equals desired path', () => {
+    const files = [{ path: '1.00', timestamp: 1 }]
+    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    expect(renameOps).toHaveLength(0)
+    expect(moveOps).toHaveLength(0)
+  })
+
+  it('should create moveOps if path does not match path calculated from timestamp', () => {
     const files = [
-      fakeMediaFile(100, 1),
-      fakeMediaFile(100, 2),
-      fakeMediaFile(100, 3),
-      fakeMediaFile(200, 4),
+      { path: '1.00', timestamp: 1.01 },
+      { path: '2.00', timestamp: 2.01 },
     ]
-    const filesInFolder = mergeFilesInFolder(files, files).map((f) => f.path)
-    expect(filesInFolder).toEqual(['100-1.jpg', '100-2.jpg', '100-3.jpg', '200-4.jpg'])
-  })
-
-  it('should attach file name', () => {
-    const filesInFolder = mergeFilesInFolder([fakeMediaFile(100000)], [fakeMediaFile(200000)])
-
-    expect(filesInFolder[0].file).toEqual(makeFileName(100000, '.jpg'))
-    expect(filesInFolder[1].file).toEqual(makeFileName(200000, '.jpg'))
-  })
-})
-
-const fakeFinalMediaFile = (from: number): FinalMediaFile => ({
-  created: from,
-  path: `/path/${from}.jpg`,
-  folder: 'some/folder',
-  file: `file_${from + 1}.jpg`,
-})
-
-it('should throw if not all files have the same folder', () => {
-  const files = [fakeFinalMediaFile(1), { ...fakeFinalMediaFile(2), folder: 'different/folder' }]
-  expect(() => assertAllFilesHaveSameFolder(files)).toThrowError()
-})
-
-describe.skip('calcMoveCommands', () => {
-  const root = '/root'
-
-  it('should drop files which do not need to be moved', () => {
-    const files = [0, 1, 2, 3, 4].map(fakeFinalMediaFile)
-    files[0].path = '/root/some/folder/file_1.jpg'
-
-    const commands = calcMoveCommands(files, root)
-    expect(commands).toHaveLength(4)
-    expect(commands.map((c) => c.from)).not.toContain('/root/some/folder/file_1.jpg')
-  })
-
-  const makeMovedMediaFile = ([from, to]: number[]): FinalMediaFile => ({
-    created: 0,
-    path: `/f/${from}`,
-    folder: 'f',
-    file: `${to}`,
-  })
-
-  it('should generate intermediate copy command to break lock', () => {
-    const files = [
-      [2, 1],
-      [1, 2],
-    ].map(makeMovedMediaFile)
-    const commands = calcMoveCommands(files, '/')
-    expect(commands).toStrictEqual([
-      { from: '/f/2', to: '/f/1.parked' },
-      { from: '/f/1', to: '/f/2' },
-      { from: '/f/1.parked', to: '/f/1' },
+    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    expect(renameOps).toHaveLength(0)
+    expect(moveOps).toEqual([
+      { from: '1.00', to: '1.01' },
+      { from: '2.00', to: '2.01' },
     ])
   })
 
-  it('should generate intermediate copy commands to break locks', () => {
+  it('should create renameOps if files are renamed to existing files', () => {
     const files = [
-      [2, 1],
-      [1, 2],
-      [4, 3],
-      [3, 4],
-    ].map(makeMovedMediaFile)
-    const commands = calcMoveCommands(files, '/')
-    expect(commands).toStrictEqual([
-      { from: '/f/2', to: '/f/1.parked' },
-      { from: '/f/1', to: '/f/2' },
-      { from: '/f/1.parked', to: '/f/1' },
-      { from: '/f/3', to: '/f/4.parked' },
-      { from: '/f/4', to: '/f/3' },
-      { from: '/f/4.parked', to: '/f/4' },
+      { path: 'new.jpg', timestamp: 1.01 },
+      { path: '1.01', timestamp: 1.02 },
+      { path: '1.02', timestamp: 1.03 },
+    ]
+    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    expect(renameOps).toEqual([
+      { from: '1.01', to: '__1.01' },
+      { from: '1.02', to: '__1.02' },
+    ])
+    expect(moveOps).toEqual([
+      { from: 'new.jpg', to: '1.01' },
+      { from: '__1.01', to: '1.02' },
+      { from: '__1.02', to: '1.03' },
     ])
   })
 
-  it('should handle copy up', () => {
+  it('should create valid ops for cyclic renamed files', () => {
     const files = [
-      [1, 2],
-      [2, 3],
-      [3, 4],
-    ].map(makeMovedMediaFile)
-    const commands = calcMoveCommands(files, '/')
-    expect(commands).toStrictEqual([
-      { from: '/f/3', to: '/f/4' },
-      { from: '/f/2', to: '/f/3' },
-      { from: '/f/1', to: '/f/2' },
+      { path: '1.00', timestamp: 1.01 },
+      { path: '1.01', timestamp: 1.02 },
+      { path: '1.02', timestamp: 1.0 },
+    ]
+    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    expect(renameOps).toEqual([
+      { from: '1.00', to: '__1.00' },
+      { from: '1.01', to: '__1.01' },
+      { from: '1.02', to: '__1.02' },
     ])
-  })
-
-  it('should handle copy down', () => {
-    const files = [
-      [4, 3],
-      [3, 2],
-      [2, 1],
-    ].map(makeMovedMediaFile)
-    const commands = calcMoveCommands(files, '/')
-    expect(commands).toStrictEqual([
-      { from: '/f/2', to: '/f/1' },
-      { from: '/f/3', to: '/f/2' },
-      { from: '/f/4', to: '/f/3' },
+    expect(moveOps).toEqual([
+      { from: '__1.00', to: '1.01' },
+      { from: '__1.01', to: '1.02' },
+      { from: '__1.02', to: '1.00' },
     ])
   })
 })

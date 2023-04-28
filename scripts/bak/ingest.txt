@@ -1,7 +1,7 @@
 import { move, mkdirp, remove } from 'fs-extra'
 import { join } from 'path'
-import { MediaPattern, PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
-import { createPhotoAndVideoIndex } from './create-index'
+import { PhotoPattern, PhotoRoot, VideoPattern, VideoRoot } from './config'
+
 import { makePhotoFolderName, makeVideoFolderName } from './names'
 import {
   readMediaFiles,
@@ -12,18 +12,18 @@ import {
   MediaFile,
 } from './organize'
 import { readFiles, readFolders } from './read'
-import { readPhotoCreationDate, readVideoCreationDate } from './read-creation-date'
+import { readPhotoTimestamp, readVideoTimestamp } from './read-timestamp'
 
 type ReadMediaFiles = (folder: string) => Promise<MediaFile[]>
 
 async function readPhotos(folder: string) {
   const files = await readFiles(folder, PhotoPattern)
-  return await readMediaFiles(files, readPhotoCreationDate, makePhotoFolderName)
+  return await readMediaFiles(files, readPhotoTimestamp, makePhotoFolderName)
 }
 
 async function readVideos(folder: string) {
   const files = await readFiles(folder, VideoPattern)
-  return await readMediaFiles(files, readVideoCreationDate, makeVideoFolderName)
+  return await readMediaFiles(files, readVideoTimestamp, makeVideoFolderName)
 }
 
 export async function removeEmptyFolder(folder: string): Promise<void> {
@@ -33,6 +33,9 @@ export async function removeEmptyFolder(folder: string): Promise<void> {
 
 export async function moveFile(from: string, to: string): Promise<void> {
   console.log(`move ${from} -> ${to}`)
+
+  // bring back the dry run
+
   await move(from, to, { overwrite: false })
 }
 
@@ -40,8 +43,9 @@ export async function moveFile(from: string, to: string): Promise<void> {
 export async function removeFoldersWithoutMediaFiles(folder: string) {
   const folders = await readFolders(folder)
   await Promise.all(folders.map(removeFoldersWithoutMediaFiles))
-  const entries = await readFiles(folder, MediaPattern)
-  if (entries.length === 0) {
+  const photos = await readFiles(folder, PhotoPattern)
+  const videos = await readFiles(folder, VideoPattern)
+  if (photos.length + videos.length === 0) {
     await removeEmptyFolder(folder)
   }
 }
@@ -78,5 +82,5 @@ async function reindex() {
 if (require.main === module) {
   const source = process.argv[2]
   const promise = source === 'reindex' ? reindex() : ingest(source)
-  promise.then(createPhotoAndVideoIndex).catch(console.error)
+  // promise.then(createPhotoAndVideoIndex).catch(console.error)
 }

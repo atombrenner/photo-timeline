@@ -1,103 +1,82 @@
-import { join, extname } from 'path'
-import { makeFileName, MakeFolderName } from './names'
-import { ReadCreationDate } from './read-creation-date'
+import { join } from 'node:path'
+import fs from 'fs-extra'
+import { FromTo, moveFile, renameFile } from './filesystem'
+import { MediaFile } from './media-files'
+import { MakePathName } from './names'
 
-export interface MediaFile {
-  path: string
-  created: number // Date
-  folder: string
-}
-export interface FinalMediaFile extends MediaFile {
-  file: string
-}
+export const organizeMediaFiles = async (
+  files: MediaFile[],
+  rootPath: string,
+  makePathName: MakePathName,
+) => {
+  // sort by timestamp and add sequence if same second
+  organizeByTimestamp(files)
+  const makeRootPathName = (timestamp: number) => join(rootPath, makePathName(timestamp))
+  const { renameOps, moveOps } = calcMoveFileOps(files, makeRootPathName)
 
-export async function readMediaFiles(
-  files: string[],
-  readCreationDate: ReadCreationDate,
-  makeFolderName: MakeFolderName,
-): Promise<MediaFile[]> {
-  const makeMediaFile = async (path: string): Promise<MediaFile> => {
-    const created = await readCreationDate(path)
-    const folder = makeFolderName(created)
-    return { path, created, folder }
-  }
+  const indexFileName = join(rootPath, 'index.json')
 
-  return Promise.all(files.map(makeMediaFile))
-}
+  // remove index, so we don't have inconsistent data during file movements
+  fs.removeSync(indexFileName)
+  // rename conflicting files before moving
+  await Promise.all(renameOps.map(renameFile))
+  // files must not be moved until conflicting files are renamed
+  await Promise.all(moveOps.map(moveFile))
 
-export async function groupByFolder<T extends { folder: string }>(files: T[]) {
-  const grouped: Record<string, T[]> = {}
-  for (const file of files) {
-    const group = grouped[file.folder] ?? []
-    if (group.length === 0) grouped[file.folder] = group
-    group.push(file)
-  }
-  return grouped
+  // as a last step, write the new index
+  const index = files.map(({ timestamp }) => timestamp)
+  fs.writeJSONSync(indexFileName, index)
+  console.log(`wrote ${indexFileName} with ${index.length} entries`)
 }
 
-export function assertAllFilesHaveSameFolder(files: { folder: string }[]) {
-  if (!files.every((f) => f.folder === files[0].folder))
-    throw Error('all files must have the same folder: ' + files.map((f) => f.folder).join(', '))
-}
+// sorts an array of items by its timestamp property
+// and create a sequence number as a fraction for
+// multiple items in the same second
+// for performance reasons the array and timestamp are mutated in place
+export const organizeByTimestamp = (items: MediaFile[]): void => {
+  // sort by full timestamp
+  items.sort((a, b) => a.timestamp - b.timestamp)
 
-// const compare = new Intl.Collator('en').compare
-
-// merge two file arrays with the same folder, sort by creation date and generate filename
-export function mergeFilesInFolder(left: MediaFile[], right: MediaFile[]): FinalMediaFile[] {
-  return []
-  // const byCreated = (a: MediaFile, b: MediaFile) =>
-  //   a.created === b.created ? compare(a.path, b.path) : a.created - b.created
-
-  // const makeFinalMediaFile = (item: MediaFile, index: number) => ({
-  //   ...item,
-  //   file: makeFileName(item.created, index, extname(item.path)),
-  // })
-
-  // const rightPath = new Set(right.map((f) => f.path))
-  // const uniqFiles = [...left.filter((f) => !rightPath.has(f.path)), ...right]
-
-  // return uniqFiles.sort(byCreated).map(makeFinalMediaFile)
-}
-
-// sort file for move operations
-export function calcMoveCommands(files: FinalMediaFile[], rootFolder: string) {
-  let filesToMove = files
-    .map((f) => ({ from: f.path, to: join(rootFolder, f.folder, f.file) }))
-    .filter((f) => f.from !== f.to)
-
-  if (new Set(filesToMove.map((f) => f.to)).size !== filesToMove.length)
-    throw Error('more than one file with the same target path detected')
-
-  const commands = []
-
-  // iterate in alternating order (to not degenerate performance)
-  // over filesToMove until all commands are in an non overwriting order
-  const blocked = new Set(filesToMove.map((f) => f.from))
-  while (filesToMove.length > 0) {
-    const blockedCommands = []
-    for (let i = filesToMove.length; i-- > 0; ) {
-      const command = filesToMove[i]
-      if (blocked.has(command.to)) {
-        blockedCommands.push(command)
-      } else {
-        commands.push(command)
-        if (!blocked.has(command.from))
-          throw Error('attempt to remove an unknown blocked file: ' + command.from)
-        blocked.delete(command.from)
+  // add sequence number as fraction if timestamps are in the same second
+  for (let i = items.length - 1; i > 0; ) {
+    const stop = i
+    const currentSecond = toSeconds(items[stop].timestamp)
+    do i--
+    while (i >= 0 && toSeconds(items[i].timestamp) === currentSecond)
+    const count = stop - i
+    if (count > 1) {
+      if (count > 99) throw Error('too many timestamps per second')
+      for (let seq = 1; seq <= count; ++seq) {
+        // add sequence number j as a two digit fraction
+        items[i + seq].timestamp += seq / 100
       }
     }
-    // detect case when two files swap, eg 1 -> 2 and 2 -> 1
-    if (filesToMove.length === blockedCommands.length) {
-      const cmd = blockedCommands.pop()
-      const parked = cmd!.to + '.parked'
-      if (blocked.has(parked)) throw Error('cannot find a move command order')
-      blocked.add(parked)
-      blocked.delete(cmd!.from)
-      commands.push({ from: cmd!.from, to: parked })
-      blockedCommands.push({ from: parked, to: cmd!.to })
+  }
+}
+
+const toSeconds = (timestamp: number) => Math.trunc(timestamp / 1000)
+
+export const calcMoveFileOps = (files: MediaFile[], makePathName: MakePathName) => {
+  const targets = new Set<string>()
+
+  const moveOps: FromTo[] = []
+  for (const file of files) {
+    const path = makePathName(file.timestamp)
+    if (path !== file.path) {
+      moveOps.push({ from: file.path, to: path })
+      targets.add(path)
     }
-    filesToMove = blockedCommands
   }
 
-  return commands
+  // temporary rename files which have a path that is the target of another file
+  const renameOps: FromTo[] = []
+  for (const move of moveOps) {
+    if (targets.has(move.from)) {
+      const tmpPath = '__' + move.from
+      renameOps.push({ from: move.from, to: tmpPath })
+      move.from = tmpPath
+    }
+  }
+
+  return { renameOps, moveOps }
 }

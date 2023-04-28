@@ -1,14 +1,14 @@
 #!/usr/bin/env -S npx ts-node -T
 import { format } from 'date-fns'
 import { PhotoPattern, PhotoRoot } from './config'
-import { readFiles } from './read'
-import { readPhotoCreationDate } from './read-creation-date'
+import { listFiles } from './filesystem'
+import { readPhotoTimestamp } from './media-files'
 
 const truncSecond = (ts: number) => Math.trunc(ts / 1000) * 1000
 
 async function checkCreationDateUniqueness() {
   const photos = new Map<number, number>()
-  const files = await readFiles(PhotoRoot, PhotoPattern)
+  const files = await listFiles(PhotoRoot, PhotoPattern)
   console.log(`inspecting ${files.length} files`)
   const chunks = 8
   const chunkSize = Math.round(files.length / chunks)
@@ -17,7 +17,7 @@ async function checkCreationDateUniqueness() {
     const stop = Math.min(start + chunkSize, files.length)
     for (let i = start; i < stop; ++i) {
       const file = files[i]
-      const ts = truncSecond(await readPhotoCreationDate(file))
+      const ts = truncSecond(await readPhotoTimestamp(file))
       const count = photos.get(ts)
       if (count) {
         photos.set(ts, count + 1)
