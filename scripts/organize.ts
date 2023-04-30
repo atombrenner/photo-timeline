@@ -23,10 +23,13 @@ export const organizeMediaFiles = async (
   // files must not be moved until conflicting files are renamed
   await Promise.all(moveOps.map(moveFile))
 
+  // remove empty folders
+  console.log('TODO: remove empty folders')
+
   // as a last step, write the new index
   const index = files.map(({ timestamp }) => timestamp)
   fs.writeJSONSync(indexFileName, index)
-  console.log(`wrote ${indexFileName} with ${index.length} entries`)
+  console.log(`wrote ${index.length} entries to ${indexFileName}`)
 }
 
 // sorts an array of items by its timestamp property
@@ -54,7 +57,7 @@ export const organizeByTimestamp = (items: MediaFile[]): void => {
   }
 }
 
-const toSeconds = (timestamp: number) => Math.trunc(timestamp / 1000)
+export const toSeconds = (timestamp: number) => Math.trunc(timestamp / 1000)
 
 export const calcMoveFileOps = (files: MediaFile[], makePathName: MakePathName) => {
   const targets = new Set<string>()

@@ -17,6 +17,17 @@ export const renameFile = ({ from, to }: FromTo): Promise<void> => {
 // ignore folders that start with a dot or are surrounded with underscores
 const ignoredFolders = /^((\..*)|(_.*_))$/
 
+/** list all folders without matching files */
+// export async function listFoldersWithoutFiles(folder: string, pattern: RegExp) {
+//   const folders = await listFolders(folder)
+//   await Promise.all(folders.map((f) => removeFoldersWithoutFiles(f, pattern)))
+//   await listFiles(folder, pattern)
+
+//   if (photos.length + videos.length === 0) {
+//     await removeEmptyFolder(folder)
+//   }
+// }
+
 // list recursively all files in a folder that match the given pattern
 // the returned list is sorted and each item is the full path
 export async function listFiles(folder: string, pattern: RegExp): Promise<string[]> {
