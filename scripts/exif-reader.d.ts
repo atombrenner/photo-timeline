@@ -1,16 +1,15 @@
 declare module 'exif-reader' {
-  // see https://github.com/devongovett/exif-reader
-  type Exif = {
-    image: Record<string, string | number | Date> & {
-      ModifyDate: Date
-    }
-    thumbnail: Record<string, number>
-    exif: Record<string, string | number | Date | Buffer> & {
+  // see https://github.com/devongovett/exif-reader/blob/master/index.js#L55-L59
+  // some fields are automatically converted to `Date` type
+  type Exif = Partial<{
+    exif: Partial<{
       DateTimeOriginal: Date
-    }
-    gps: any
-    interop: any
-  }
+      SubSecTimeOriginal: string
+    }>
+    image: Partial<{
+      ModifyDate: Date
+    }>
+  }>
 
   export default function exif(buffer: Buffer): Exif
 }
