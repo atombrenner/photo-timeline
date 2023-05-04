@@ -23,9 +23,6 @@ export const organizeMediaFiles = async (
   // files must not be moved until conflicting files are renamed
   await Promise.all(moveOps.map(moveFile))
 
-  // remove empty folders
-  console.log('TODO: remove empty folders')
-
   // as a last step, write the new index
   const index = files.map(({ timestamp }) => timestamp)
   fs.writeJSONSync(indexFileName, index)

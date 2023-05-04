@@ -1,36 +1,25 @@
-import { join } from 'node:path'
-import { readdir } from 'node:fs/promises'
-import fs from 'fs-extra'
+import { join, basename } from 'node:path'
+import { readdir, rmdir } from 'node:fs/promises'
+import { move, rename } from 'fs-extra'
 
 export type FromTo = { from: string; to: string }
 
 export const moveFile = ({ from, to }: FromTo): Promise<void> => {
   console.log(`move ${from} -> ${to}`)
-  return fs.move(from, to, { overwrite: false })
+  return move(from, to, { overwrite: false })
 }
 
 export const renameFile = ({ from, to }: FromTo): Promise<void> => {
   console.log(`rename ${from} -> ${to}`)
-  return fs.rename(from, to)
+  return rename(from, to)
 }
 
 // ignore folders that start with a dot or are surrounded with underscores
 const ignoredFolders = /^((\..*)|(_.*_))$/
 
-/** list all folders without matching files */
-// export async function listFoldersWithoutFiles(folder: string, pattern: RegExp) {
-//   const folders = await listFolders(folder)
-//   await Promise.all(folders.map((f) => removeFoldersWithoutFiles(f, pattern)))
-//   await listFiles(folder, pattern)
-
-//   if (photos.length + videos.length === 0) {
-//     await removeEmptyFolder(folder)
-//   }
-// }
-
 // list recursively all files in a folder that match the given pattern
 // the returned list is sorted and each item is the full path
-export async function listFiles(folder: string, pattern: RegExp): Promise<string[]> {
+export const listFiles = async (folder: string, pattern: RegExp): Promise<string[]> => {
   const paths: string[] = []
 
   const innerReadFiles = async (folder: string) => {
@@ -51,12 +40,18 @@ export async function listFiles(folder: string, pattern: RegExp): Promise<string
   return paths.sort()
 }
 
-// list non-recursively (flat) all folders
-// the returned list is sorted and each entry is the full path
-export async function listFolders(folder: string): Promise<string[]> {
-  const entries = await readdir(folder, { withFileTypes: true })
-  return entries
-    .filter((e) => e.isDirectory() && e.name[0] !== '.')
-    .map((e) => join(folder, e.name))
-    .sort()
+export const removeEmptyFolders = async (folder: string): Promise<boolean> => {
+  if (ignoredFolders.test(basename(folder))) return false
+  const folders = []
+  let hasFiles = false
+  for (const entry of await readdir(folder, { withFileTypes: true })) {
+    if (entry.isDirectory()) folders.push(entry.name)
+    else hasFiles = true
+  }
+  const removed = await Promise.all(folders.map((f) => removeEmptyFolders(join(folder, f))))
+  if (hasFiles || removed.some((f) => !f)) return false
+
+  console.log(`removing empty folder ${folder}`)
+  await rmdir(folder)
+  return true
 }

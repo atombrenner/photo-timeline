@@ -1,13 +1,12 @@
-// npx ts-node -T reindex.ts
-
 import { join } from 'node:path'
 import { organizeMediaFiles } from './organize'
 import { MakePathName, makePhotoPathName, makeVideoPathName } from './names'
 import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from './media-files'
+import { removeEmptyFolders } from './filesystem'
 
 console.log('reindex', process.argv.slice(2))
 
-async function main() {
+export const reindexCommand = async () => {
   // figure out if we want to specify the folder of the index
   const rootPath = '/home/christian/TestMedia'
 
@@ -18,6 +17,8 @@ async function main() {
   // Videos
   const videoRootPath = join(rootPath, 'Videos')
   await reindex(videoRootPath, readVideoFiles, makeVideoPathName)
+
+  await removeEmptyFolders(rootPath)
 }
 
 const reindex = async (rootPath: string, readFiles: ReadMediaFiles, makePathName: MakePathName) => {
@@ -37,5 +38,3 @@ export const ingest = async (source: string, rootPath: string) => {
   // 3. Clean source (delete all empty folders)
   //    list files to clean and ask user for permission
 }
-
-main().catch(console.error)
