@@ -10,6 +10,12 @@ describe('organizeByTimestamp', () => {
     expect(items).toEqual(makeItems(1000, 2000, 3000, 4000))
   })
 
+  it('should remove fractions and regenerate fractions', () => {
+    const items = makeItems(1000.11, 2000.22, 3000.33, 4000.44, 4000.55)
+    organizeByTimestamp(items)
+    expect(items).toEqual(makeItems(1000, 2000, 3000, 4000.01, 4000.02))
+  })
+
   it('should add sequence number as fraction to duplicates', () => {
     const items = makeItems(1000, 2000, 3100, 3200, 3500, 4000, 4999, 5000)
     organizeByTimestamp(items)

@@ -39,13 +39,13 @@ export const readPhotoTimestamp: ReadTimestamp = async (file) => {
   const parsed = parseExif(metadata.exif)
   const ms = Number('0.' + (parsed.exif?.SubSecTimeOriginal || '0')) * 1000
   const timestamp = Number(parsed.exif?.DateTimeOriginal || parsed.image?.ModifyDate || 0) + ms
-  if (timestamp < 1) throw Error('Cannot read photo timestamp for ' + file)
+  if (timestamp < 1) throw Error('cannot read photo timestamp for ' + file)
   return Math.trunc(timestamp)
 }
 
 export const readVideoTimestamp: ReadTimestamp = async (file) => {
   // ideally get it from mp4 container without having to use ffprobe
   const { created } = await ffprobe(file) // works for avi, mp4, mov
-  if (!isNaN(created)) return Math.trunc(created)
-  throw Error('Cannot read video timestamp for ' + file)
+  if (isNaN(created)) throw Error('cannot read video timestamp for ' + file)
+  return Math.trunc(created)
 }

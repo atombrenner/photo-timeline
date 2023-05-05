@@ -34,6 +34,12 @@ export const organizeMediaFiles = async (
 // multiple items in the same second
 // for performance reasons the array and timestamp are mutated in place
 export const organizeByTimestamp = (items: MediaFile[]): void => {
+  // for robustness, remove all fractions from timestamps before processing
+  for (let i = items.length; i-- > 0; ) {
+    const item = items[i]
+    item.timestamp = Math.trunc(item.timestamp)
+  }
+
   // sort by full timestamp
   items.sort((a, b) => a.timestamp - b.timestamp)
 
