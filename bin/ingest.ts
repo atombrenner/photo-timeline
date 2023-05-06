@@ -1,13 +1,13 @@
 #!/usr/bin/env -S npx ts-node -T
 
 import { join } from 'node:path'
-import { removeEmptyFolders } from '../src/filesystem'
-import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from '../src/media-files'
-import { MakePathName, makePhotoPathName, makeVideoPathName } from '../src/names'
-import { organize, readIndex } from '../src/organize'
+import { removeEmptyFolders } from 'lib/filesystem'
+import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from 'lib/media-files'
+import { MakePathName, makePhotoPathName, makeVideoPathName } from 'lib/names'
+import { organize, readIndex } from 'lib/organize'
 
 async function main() {
-  const args = process.argv.slice(2)
+  // const args = process.argv.slice(2)
   const source = '/home/christian/TestCamera' //  args[0]
   const rootPath = '/home/christian/TestMedia'
 

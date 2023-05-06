@@ -10,33 +10,25 @@
     "start": "cd webapp && vite",
     "build:webapp": "cd webapp && vite build",
     "deploy": "npm run build && rm -rf /home/christian/Data/MyMedia/Photos/_app_ && cp -r build /home/christian/Data/MyMedia/Photos/_app_",
-    "tsc": "tsc --build src server && tsc -p webapp",
+    "tsc": "tsc --build lib server && tsc -p webapp",
     "build": "npm run build:webapp && npm run build:server",
-    "test": "jest",
-    "test:ci": "jest --ci --runInBand --reporters=default --reporters=jest-junit",
+    "test": "npm -w lib run test",
+    "test:ci": "npm -w lib run test:ci",
     "--server--": "",
     "server": "PHOTOS=/home/christian/Data/MyMedia/Photos ts-node-dev -T -P server/tsconfig.json server/index.ts",
-    "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=build/server.js server/index.ts",
-    "--scripts--": "",
-    "ffprobe": "ts-node -T -P src/tsconfig.json src/ffprobe"
+    "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=build/server.js server/index.ts"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",
     "@preact/signals": "^1.1.3",
     "date-fns": "^2.21.1",
-    "exif-reader": "^1.2.0",
     "fs-extra": "^11.1.1",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
     "koa-static": "^5.0.0",
-    "preact": "^10.13.0",
-    "sharp": "^0.32.0"
+    "preact": "^10.13.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
-    "@babel/preset-env": "^7.21.4",
-    "@babel/preset-react": "^7.12.10",
-    "@babel/preset-typescript": "^7.21.4",
     "@preact/preset-vite": "^2.5.0",
     "@testing-library/preact": "^3.2.3",
     "@tsconfig/node18": "^1.0.0",
@@ -46,17 +38,15 @@
     "@types/koa__cors": "^3.0.2",
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-static": "^4.0.1",
-    "@types/sharp": "^0.31.1",
-    "babel-jest": "^29.5.0",
     "esbuild": "^0.17.16",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^29.5.0",
-    "jest-environment-jsdom": "^29.5.0",
-    "jest-junit": "^15.0.0",
     "prettier": "^2.8.8",
     "ts-node": "^10.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.0"
-  }
+  },
+  "workspaces": [
+    "lib"
+  ]
 }

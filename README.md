@@ -72,23 +72,22 @@ MyMedia
 
 ## Commands
 
-### Ingest
+### Ingest (Import and Organize)
 
-`npx ingest camera`
-`npx ingest ` -- list all implemented sources
+`npx ingest <source> [media]` where source is a folder or a name defined in config.ts
 
 ### Reindex (Reorganize)
+
+`npx reindex [media]` where media is a folder with photos and videos to organize
 
 Syncs the existing index.json with existing media files. If files were (re)moved
 or deleted index and filenames will be updated
 
-`npx reindex photos`
-`npx reindex videos`
-`npx reindex photos --folder hullebulle`
-
 ## Stats
 
-Analyse existing photos and report some statistics
+`npx stats [media]`
+
+Analyze existing photos and report some statistics
 
 ## Config
 
@@ -97,8 +96,8 @@ Configuration is in [`config.ts`](scripts/config.ts).
 ## Implementation Details
 
 - if we use `fs-extra` for high-level file operations, e.g. moving files
-  accross file systems, we can also use the more covenient wrapper functions
-- at least on unix, it seems to be fine to have hundred thousands of move
+  across file systems, we can also use the more convenient wrapper functions
+- at least on unix, it seems to be fine to have thousands of move
   operations running in parallel with Promise.all()
 
 ### Timestamp based index and filename generation

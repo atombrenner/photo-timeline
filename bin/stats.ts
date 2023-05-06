@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npx ts-node -T
 import { format } from 'date-fns'
-import { readPhotoFiles } from './media-files'
+import { readPhotoFiles } from 'lib/media-files'
 
 const toSecond = (ts: number) => Math.trunc(ts / 1000)
 
