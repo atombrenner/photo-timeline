@@ -1,9 +1,10 @@
 import cors from '@koa/cors'
-import { appendFile, mkdirsSync, move, readJson, writeJson } from 'fs-extra'
+import { appendFile, mkdirsSync, move, readJSON, writeJSON } from 'fs-extra'
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import serveStatic from 'koa-static'
 import { join, basename } from 'path'
+import { makePhotoPathName } from 'lib/names'
 
 const photos = process.env.PHOTOS ?? join(__dirname, '..')
 const deletedPhotos = join(photos, '_deleted_')
@@ -13,12 +14,19 @@ const app = new Koa()
 app.use(cors()) // necessary for development because localhost:3000 is a different origin than localhost:9000
 app.use(bodyParser())
 app.use(async (ctx, next) => {
-  const path = decodeURIComponent(ctx.URL.pathname)
+  if (ctx.path === '/index.json') return await next()
+
+  const timestamp = Number.parseFloat(ctx.path.substring(1))
+  if (isNaN(timestamp)) {
+    ctx.status = 404
+    return
+  }
+  ctx.path = makePhotoPathName(timestamp)
   if (ctx.method === 'DELETE') {
-    deletePhoto(path)
+    deletePhoto(ctx.path, timestamp)
     ctx.body = 'OK'
   } else if (ctx.method === 'POST') {
-    rotatePhoto(path, ctx.request.body)
+    rotatePhoto(ctx.path, ctx.request.body)
     ctx.body = 'OK'
   } else {
     await next()
@@ -38,11 +46,14 @@ function rotatePhoto(path: string, body: any) {
   return appendFile(join(photos, 'rotated.txt'), `${path}\n`)
 }
 
-async function deletePhoto(path: string) {
+async function deletePhoto(path: string, timestamp: number) {
   move(join(photos, path), join(photos, '_deleted_', basename(path)))
-  const indexFile = join(photos, 'index.json')
-  const itemToBeDeleted = path.substring(1) // remove leading slash
-  const index: string[] = await readJson(indexFile)
-  const indexWithPhotoRemoved = index.filter((item) => item !== itemToBeDeleted)
-  await writeJson(indexFile, indexWithPhotoRemoved)
+
+  // update index
+  const indexFileName = join(photos, 'index.json')
+  const index: number[] = await readJSON(indexFileName)
+  await writeJSON(
+    indexFileName,
+    index.filter((item) => item !== timestamp),
+  )
 }

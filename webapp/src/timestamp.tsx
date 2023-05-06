@@ -1,14 +1,10 @@
-import { h } from 'preact'
 import './timestamp.css'
+import format from 'date-fns/format'
 
 export type TimestampProps = {
-  photo: string
+  timestamp: number
 }
 
-export const Timestamp = ({ photo }: TimestampProps) => {
-  return <div class="timestamp">{getDate(photo)}</div>
-}
-
-function getDate(path: string) {
-  return path.substring(path.lastIndexOf('/') + 1, 14)
-}
+export const Timestamp = ({ timestamp }: TimestampProps) => (
+  <div class="timestamp">{format(timestamp, 'yyyy-MM-dd HH:mm:ss')}</div>
+)

@@ -1,4 +1,3 @@
-import { h } from 'preact'
 import './photo.css'
 
 export type PhotoProps = Readonly<{

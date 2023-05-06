@@ -1,11 +1,12 @@
 import add from 'date-fns/add'
 
-export type NavigationCommand = (images: string[], current: number) => number
+export type NavigationCommand = (photos: number[], current: number) => number
 
-const skipN = (count: number) => (images: string[], current: number) => {
+const skipN = (count: number) => (photos: number[], current: number) => {
+  console.log('skip', count, current, photos.length)
   current += count
   if (current < 0) return 0
-  if (current >= images.length) return images.length - 1
+  if (current >= photos.length) return photos.length - 1
   return current
 }
 
@@ -20,28 +21,18 @@ export const prev20 = skipN(-20)
 export const prev30 = skipN(-30)
 export const prev50 = skipN(-50)
 
-function getDate(imagePath: string) {
-  return imagePath.substr(imagePath.lastIndexOf('/') + 1, 10)
-}
-
-function addToDate(imagePath: string, duration: Duration) {
-  return add(Date.parse(getDate(imagePath)), duration)
-    .toISOString()
-    .substr(0, 10)
-}
-
-const nextDate = (offset: Duration) => (images: string[], current: number) => {
-  const stopDate = addToDate(images[current], offset)
-  for (let i = current + 1; i < images.length; i += 1) {
-    if (getDate(images[i]) >= stopDate) return i
+const nextDate = (offset: Duration) => (photos: number[], current: number) => {
+  const stopDate = Number(add(photos[current], offset))
+  for (let i = current + 1; i < photos.length; i += 1) {
+    if (photos[i] >= stopDate) return i
   }
-  return images.length - 1
+  return photos.length - 1
 }
 
-const prevDate = (offset: Duration) => (images: string[], current: number) => {
-  const stopDate = addToDate(images[current], offset)
+const prevDate = (offset: Duration) => (photos: number[], current: number) => {
+  const stopDate = Number(add(photos[current], offset))
   for (let i = current - 1; i >= 0; i -= 1) {
-    if (getDate(images[i]) <= stopDate) return i
+    if (photos[i] <= stopDate) return i
   }
   return 0
 }
@@ -56,11 +47,8 @@ export const prevMonth = prevDate({ months: -1 })
 export const prevYear = prevDate({ years: -1 })
 
 export const first = () => 0
-export const last = (images: string[]) => images.length - 1
-export const start = (images: string[]) => {
-  const stopDate = getDate(images[images.length - 1]).substr(0, 8) + '00'
-  for (let i = images.length - 1; i >= 0; i -= 1) {
-    if (getDate(images[i]) < stopDate) return i + 1
-  }
-  return 0
+export const last = (photos: number[]) => photos.length - 1
+export const start = (photos: number[]) => {
+  // todo start with first photo of last ingestion (need some persistent state)
+  return last(photos)
 }
