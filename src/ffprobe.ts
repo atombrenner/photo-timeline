@@ -26,8 +26,7 @@ export function ffprobe(path: string) {
   })
 }
 
-// if called via npm run ffprobe
+// if called via npm run ffprobe <filename>
 if (require.main === module) {
-  console.log(process.argv)
   ffprobe(process.argv[2]).then(console.log).catch(console.error)
 }

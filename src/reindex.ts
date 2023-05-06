@@ -1,8 +1,8 @@
 import { join } from 'node:path'
-import { organizeMediaFiles } from './organize'
-import { MakePathName, makePhotoPathName, makeVideoPathName } from './names'
-import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from './media-files'
 import { removeEmptyFolders } from './filesystem'
+import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from './media-files'
+import { MakePathName, makePhotoPathName, makeVideoPathName } from './names'
+import { organize } from './organize'
 
 console.log('reindex', process.argv.slice(2))
 
@@ -23,18 +23,5 @@ export const reindexCommand = async () => {
 
 const reindex = async (rootPath: string, readFiles: ReadMediaFiles, makePathName: MakePathName) => {
   const files = await readFiles(rootPath)
-  await organizeMediaFiles(files, rootPath, makePathName)
-}
-
-export const ingest = async (source: string, rootPath: string) => {
-  // Pseudo Code
-  // 1. Ingest Photos
-  // const photos: TimestampedFiles = readIndex from json and dehydrate (remove fractions)
-  // const newPhotos = readPhotoFiles(source)
-  // photos.concat(newPhotos)
-  // organizeMediaFiles(photos, getPhotoTimestamp)
-  // 2. Ingest Videos
-  // ...
-  // 3. Clean source (delete all empty folders)
-  //    list files to clean and ask user for permission
+  await organize(files, rootPath, makePathName)
 }

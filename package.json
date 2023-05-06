@@ -10,7 +10,7 @@
     "start": "cd webapp && vite",
     "build:webapp": "cd webapp && vite build",
     "deploy": "npm run build && rm -rf /home/christian/Data/MyMedia/Photos/_app_ && cp -r build /home/christian/Data/MyMedia/Photos/_app_",
-    "tsc": "tsc --build scripts server && tsc -p webapp",
+    "tsc": "tsc --build src server && tsc -p webapp",
     "build": "npm run build:webapp && npm run build:server",
     "test": "jest",
     "test:ci": "jest --ci --runInBand --reporters=default --reporters=jest-junit",
@@ -18,12 +18,7 @@
     "server": "PHOTOS=/home/christian/Data/MyMedia/Photos ts-node-dev -T -P server/tsconfig.json server/index.ts",
     "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=build/server.js server/index.ts",
     "--scripts--": "",
-    "ingest": "ts-node -T -P scripts/tsconfig.json scripts/ingest",
-    "ingest:camera": "ts-node -T -P scripts/tsconfig.json scripts/ingest /run/media/christian/9016-4EF8/DCIM/",
-    "ingest:handy": "ts-node -T -P scripts/tsconfig.json scripts/ingest /home/christian/Data/import/Camera",
-    "reindex": "ts-node -T -P scripts/tsconfig.json scripts/ingest reindex",
-    "ffprobe": "ts-node -T -P scripts/tsconfig.json scripts/ffprobe",
-    "repair": "ts-node -T -P scripts/tsconfig.json scripts/repair"
+    "ffprobe": "ts-node -T -P src/tsconfig.json src/ffprobe"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",

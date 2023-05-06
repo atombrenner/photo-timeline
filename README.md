@@ -161,6 +161,15 @@ But the best way is to pick the date from mtime (modified) and encode it in the 
 
 ffprobe works for newer formats reliable
 
+## Recursively remove executable flag
+
+Sometimes media files are executable, possible because of windows filesystems.
+Use this command to recursively remove the executable flag from all files (and not folders)
+
+```bash
+find myFolder -type f -exec chmod -x {} \;
+```
+
 ## Conversion
 
 .mp4 should be the video container

@@ -1,23 +1,38 @@
+import { readJSONSync, removeSync, writeJSONSync } from 'fs-extra'
 import { join } from 'node:path'
-import fs from 'fs-extra'
 import { FromTo, moveFile, renameFile } from './filesystem'
 import { MediaFile } from './media-files'
 import { MakePathName } from './names'
 
-export const organizeMediaFiles = async (
+const getIndexFileName = (rootPath: string) => join(rootPath, 'index.json')
+
+export const readIndex = async (
+  rootPath: string,
+  makeRelativePathName: MakePathName,
+): Promise<MediaFile[]> => {
+  const makePathName = (timestamp: number) => join(rootPath, makeRelativePathName(timestamp))
+  const index = readJSONSync(getIndexFileName(rootPath))
+  for (let i = index.length; i-- > 0; ) {
+    const timestamp = index[i]
+    index[i] = { path: makePathName(timestamp), timestamp } satisfies MediaFile
+  }
+  return index
+}
+
+export const organize = async (
   files: MediaFile[],
   rootPath: string,
-  makePathName: MakePathName,
+  makeRelativePathName: MakePathName,
 ) => {
-  // sort by timestamp and add sequence if same second
-  organizeByTimestamp(files)
-  const makeRootPathName = (timestamp: number) => join(rootPath, makePathName(timestamp))
-  const { renameOps, moveOps } = calcMoveFileOps(files, makeRootPathName)
+  const makePathName = (timestamp: number) => join(rootPath, makeRelativePathName(timestamp))
 
-  const indexFileName = join(rootPath, 'index.json')
+  // sort files by timestamp and add sequence number as fraction (mutates files array)
+  organizeByTimestamp(files)
+  const { renameOps, moveOps } = calcMoveFileOps(files, makePathName)
 
   // remove index, so we don't have inconsistent data during file movements
-  fs.removeSync(indexFileName)
+  const indexFileName = getIndexFileName(rootPath)
+  removeSync(indexFileName)
   // rename conflicting files before moving
   await Promise.all(renameOps.map(renameFile))
   // files must not be moved until conflicting files are renamed
@@ -25,7 +40,7 @@ export const organizeMediaFiles = async (
 
   // as a last step, write the new index
   const index = files.map(({ timestamp }) => timestamp)
-  fs.writeJSONSync(indexFileName, index)
+  writeJSONSync(indexFileName, index)
   console.log(`wrote ${index.length} entries to ${indexFileName}`)
 }
 
