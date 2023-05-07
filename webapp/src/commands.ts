@@ -3,7 +3,6 @@ import add from 'date-fns/add'
 export type NavigationCommand = (photos: number[], current: number) => number
 
 const skipN = (count: number) => (photos: number[], current: number) => {
-  console.log('skip', count, current, photos.length)
   current += count
   if (current < 0) return 0
   if (current >= photos.length) return photos.length - 1
@@ -49,6 +48,10 @@ export const prevYear = prevDate({ years: -1 })
 export const first = () => 0
 export const last = (photos: number[]) => photos.length - 1
 export const start = (photos: number[]) => {
-  // todo start with first photo of last ingestion (need some persistent state)
-  return last(photos)
+  const lastMonth = new Date(photos.at(-1) || 0).getMonth()
+
+  for (let i = photos.length; i-- > 0; ) {
+    if (new Date(photos[i]).getMonth() !== lastMonth) return i + 1
+  }
+  return 0
 }

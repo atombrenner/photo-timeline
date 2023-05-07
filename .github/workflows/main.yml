@@ -34,3 +34,4 @@ jobs:
         with:
           files: |
             lib/junit.xml
+            webapp/junit.xml
