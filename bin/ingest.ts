@@ -5,11 +5,12 @@ import { removeEmptyFolders } from 'lib/filesystem'
 import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from 'lib/media-files'
 import { MakePathName, makePhotoPathName, makeVideoPathName } from 'lib/names'
 import { organize, readIndex } from 'lib/organize'
+import { mediaRootPath } from 'lib/config'
 
 async function main() {
   // const args = process.argv.slice(2)
   const source = '/home/christian/TestCamera' //  args[0]
-  const rootPath = '/home/christian/TestMedia'
+  const rootPath = mediaRootPath
 
   // Photos
   const photoRootPath = join(rootPath, 'Photos')

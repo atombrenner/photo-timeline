@@ -4,7 +4,8 @@
   "license": "GPL-3.0-or-later",
   "bin": {
     "ingest": "./bin/ingest.ts",
-    "reindex": "./bin/reindex.ts"
+    "reindex": "./bin/reindex.ts",
+    "stats": "./bin/stats.ts"
   },
   "scripts": {
     "start": "cd webapp && vite",

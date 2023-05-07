@@ -110,7 +110,7 @@ Configuration is in [`config.ts`](scripts/config.ts).
 - the index should contain the sequence number if necessary to deduplicate photos
 - basic idea: index is just an array of numbers, where the integer part is the
   Unix timestamp and the fraction is the sequence number
-  - it is important that the path can be derived from the number,
+  - the pathname can be calculated solely from the number (timestamp),
     in case we need to move existing files to a new place
   - this implies that below the media root only one file extension is possible,
     for example `.jpg` or `.mp4`
@@ -166,15 +166,15 @@ Sometimes media files are executable, possible because of windows filesystems.
 Use this command to recursively remove the executable flag from all files (and not folders)
 
 ```bash
-find myFolder -type f -exec chmod -x {} \;
+find Photos -type f -exec chmod -x {} \;
 ```
 
 ## Conversion
 
 .mp4 should be the video container
 
-- `ffmpeg -i input.avi output.mp4` seems to work good enough
-- `ffmpeg -i input.wmv output.mp4` seems to work good enough
+- `ffmpeg -i input.avi output.mp4` seems to work well enough
+- `ffmpeg -i input.wmv output.mp4` seems to work well enough
 
 The `-metadata creation_time=2019-01-01T12:00:00` can set the time to the generated file
 
