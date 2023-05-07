@@ -5,8 +5,9 @@ import bodyParser from 'koa-bodyparser'
 import serveStatic from 'koa-static'
 import { join, basename } from 'path'
 import { makePhotoPathName } from 'lib/names'
+import { photoRootPath } from 'lib/config'
 
-const photos = process.env.PHOTOS ?? join(__dirname, '..')
+const photos = process.env.PHOTOS ?? photoRootPath
 const deletedPhotos = join(photos, '_deleted_')
 mkdirsSync(deletedPhotos)
 
