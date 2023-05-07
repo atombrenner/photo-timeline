@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "declaration": false,
+    "sourceMap": true,
+    "noEmit": true
+  },
+  "ts-node": { "transpileOnly": true }
+}

@@ -16,7 +16,7 @@
     "test": "vitest --dir webapp/src --globals",
     "test:ci": "npm -w lib run test:ci && vitest --run --dir webapp --globals --reporter default --reporter junit --outputFile webapp/junit.xml",
     "--server--": "",
-    "server": "PHOTOS=/home/christian/TestMedia/Photos ts-node-dev -T -P server/tsconfig.json server/index.ts",
+    "server": "ts-node-dev -T -P server/tsconfig.json server/index.ts",
     "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=build/server.js server/index.ts"
   },
   "dependencies": {
