@@ -6,7 +6,8 @@ import { photoRootPath } from 'lib/config'
 
 const toSecond = (ts: number) => Math.trunc(ts / 1000)
 
-async function checkCreationDateUniqueness() {
+async function main() {
+  // checkCreationDateUniqueness
   const photosPerSecond = new Map<number, number>()
   const files = await readPhotoFiles(photoRootPath)
 
@@ -32,4 +33,7 @@ async function checkCreationDateUniqueness() {
   console.log(`found ${duplicateCount} seconds with more than one photo, ${total} photos in total`)
 }
 
-checkCreationDateUniqueness().catch(console.error)
+main().catch((err) => {
+  console.error(`${err}`)
+  process.exit(1)
+})

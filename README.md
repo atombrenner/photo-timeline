@@ -72,33 +72,37 @@ MyMedia
 
 ## Commands
 
-### Ingest (Import and Organize)
+Commands are little scripts in the bin folder which can be quickly called with
+`npx <command>`.
 
-`npx ingest <source> [media]` where source is a folder or a name defined in config.ts
+- `npx ingest <source> [media]` moves files from a source to the media folder
 
-### Reindex (Reorganize)
+  - `source` is a [preconfigured source](lib/config.ts) or a folder path
+  - if present, `media` overrides the configured media folder
 
-`npx reindex [media]` where media is a folder with photos and videos to organize
+- `npx reindex [media]` reindex (reorganize) existing files in the media folder
 
-Syncs the existing index.json with existing media files. If files were (re)moved
-or deleted index and filenames will be updated
+  - if present, `media` overrides the configured media folder
 
-## Stats
+- `npx stats [media]` experimental analytics of files in the media folder
+  - if present, `media` overrides the configured media folder
 
-`npx stats [media]`
+### Common options:
 
-Analyze existing photos and report some statistics
+- `--photos` only work on photos
+- `--videos` only work on videos
+- `--help` show help
 
 ## Config
 
-Configuration is in [`config.ts`](scripts/config.ts).
+Configuration is stored in [`config.ts`](lib/config.ts).
 
 ## Implementation Details
 
-- if we use `fs-extra` for high-level file operations, e.g. moving files
+- if we need to use `fs-extra` for high-level file operations, e.g. moving files
   across file systems, we can also use the more convenient wrapper functions
 - at least on unix, it seems to be fine to have thousands of move
-  operations running in parallel with Promise.all()
+  operations running in parallel with Promise.all(), so no limits are implemented
 
 ### Timestamp based index and filename generation
 
