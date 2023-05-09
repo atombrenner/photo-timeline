@@ -2,8 +2,8 @@
   "name": "lib",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest",
-    "test:ci": "jest --ci --runInBand --reporters=default --reporters=jest-junit",
+    "test": "vitest --globals --root=..",
+    "test:ci": "vitest --run --globals --root=.. --reporter basic --reporter junit --outputFile junit.xml",
     "ffprobe": "ts-node -T ffprobe.ts"
   },
   "author": "Christian Rodemeyer",
@@ -13,13 +13,6 @@
     "sharp": "^0.32.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
-    "@babel/preset-env": "^7.21.4",
-    "@babel/preset-react": "^7.12.10",
-    "@babel/preset-typescript": "^7.21.4",
-    "@types/sharp": "^0.31.1",
-    "babel-jest": "^29.5.0",
-    "jest": "^29.5.0",
-    "jest-junit": "^15.0.0"
+    "@types/sharp": "^0.32.0"
   }
 }
