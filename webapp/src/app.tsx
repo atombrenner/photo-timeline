@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'preact/hooks'
-import { deletePhoto, loadPhotos, photoUrl, rotatePhoto } from './backend'
+import { useState } from 'preact/hooks'
+import { deletePhoto, photoUrl, rotatePhoto } from './backend'
 import { next10, next20, next30, next50, prev10, prev20, prev30, prev50 } from './commands'
 import { first, last, start } from './commands'
 import { next, nextDay, nextWeek, nextMonth, nextYear } from './commands'
@@ -53,24 +53,13 @@ const navigationCommands: Record<string, NavigationCommand | undefined> = {
   SpaceShift: prev,
 }
 
-export function App() {
-  const [photos, setPhotos] = useState<number[]>([])
-  const [current, setCurrent] = useState(-1) // index of currently displayed photo
+export function App({ photos: initialPhotos }: { photos: number[] }) {
+  const [photos, setPhotos] = useState(initialPhotos)
+  const [current, setCurrent] = useState(start(photos)) // index of currently displayed photo
   const [rotations, setRotations] = useState<Record<string, number>>({})
   const [showTimestamp, setShowTimestamp] = useState(true)
   const currentPhoto = photos[current]
   const currentRotation = rotations[photos[current]] || 0
-
-  console.log('current', current, photos[current])
-
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    ref.current?.focus()
-    loadPhotos().then((photos) => {
-      setPhotos(photos)
-      setCurrent(start(photos))
-    })
-  }, [ref])
 
   const rotateCurrent = (degrees: number) => {
     const rotation = (currentRotation + degrees) % 360
@@ -92,13 +81,14 @@ export function App() {
     else if (key === 'KeyR') rotateCurrent(90)
     else if (key === 'KeyRShift' || key === 'KeyRCtrl') rotateCurrent(-90)
     else if (key === 'Delete') deleteCurrent()
+    else if (key.startsWith('Tab')) e.preventDefault()
     else return
 
-    e.preventDefault()
+    e.preventDefault() // for all handled keys
   }
 
   return (
-    <div ref={ref} tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
+    <div id="app" tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
       {current >= 0 && <Photo src={photoUrl(currentPhoto)} rotation={currentRotation} />}
       {current >= 0 && showTimestamp && <Timestamp timestamp={currentPhoto} />}
     </div>
