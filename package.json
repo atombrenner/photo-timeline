@@ -10,14 +10,18 @@
   "scripts": {
     "start": "cd webapp && vite",
     "build:webapp": "cd webapp && vite build",
-    "deploy": "npm run build && rm -rf /home/christian/Data/MyMedia/Photos/_app_ && cp -r build /home/christian/Data/MyMedia/Photos/_app_",
     "tsc": "tsc --build lib server && tsc -p webapp",
-    "build": "npm run build:webapp && npm run build:server",
+    "build": "rm -rf build && npm run build:webapp && npm run build:server",
     "test": "vitest --dir webapp/src --globals",
     "test:ci": "npm -w lib run test:ci && vitest --run --dir webapp --globals --reporter basic --reporter junit --outputFile webapp/junit.xml",
     "--server--": "",
     "server": "ts-node-dev -T -P server/tsconfig.json server/index.ts",
-    "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=build/server.js server/index.ts"
+    "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=./server/build/server.js server/index.ts",
+    "--bundle--": "",
+    "deploy:clean": "rm -rf \"$MY_MEDIA/photo-timeline/\"",
+    "deploy:webapp": "cp -r ./webapp/dist \"$MY_MEDIA/photo-timeline/\"",
+    "deploy:server": "cp ./server/build/server.js \"$MY_MEDIA/photo-timeline/\"",
+    "deploy": "[[ \"$MY_MEDIA\" ]] && npm run build && npm run deploy:clean && npm run deploy:webapp && npm run deploy:server || echo '$MY_MEDIA not defined'"
   },
   "dependencies": {
     "@koa/cors": "^4.0.0",
@@ -26,6 +30,7 @@
     "fs-extra": "^11.1.1",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
+    "koa-cors": "^0.0.16",
     "koa-static": "^5.0.0",
     "preact": "^10.13.0"
   },
