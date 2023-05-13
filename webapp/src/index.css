@@ -21,7 +21,3 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
-
-*:focus {
-  border: 2px solid red;
-}

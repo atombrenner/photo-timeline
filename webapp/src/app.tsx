@@ -5,12 +5,12 @@ import { first, last, start } from './commands'
 import { next, nextDay, nextWeek, nextMonth, nextYear } from './commands'
 import { prev, prevDay, prevWeek, prevMonth, prevYear } from './commands'
 import type { NavigationCommand } from './commands'
-import { Photo } from './photo'
+import { Photo, Rotation } from './photo'
 import { Timestamp } from './timestamp'
 import './app.css'
 
 // modifiers are appended in Alt Ctrl Shift order
-function getCombinedKeyCode(e: KeyboardEvent): string {
+const getCombinedKeyCode = (e: KeyboardEvent): string => {
   let key = e.code
   if (e.altKey) key += 'Alt'
   if (e.ctrlKey) key += 'Ctrl'
@@ -53,15 +53,16 @@ const navigationCommands: Record<string, NavigationCommand | undefined> = {
   SpaceShift: prev,
 }
 
-export function App({ photos: initialPhotos }: { photos: number[] }) {
+export const App = ({ photos: initialPhotos }: { photos: number[] }) => {
   const [photos, setPhotos] = useState(initialPhotos)
   const [current, setCurrent] = useState(start(photos)) // index of currently displayed photo
-  const [rotations, setRotations] = useState<Record<string, number>>({})
+  const [rotations, setRotations] = useState<Record<string, Rotation>>({})
+  const [scale, setScale] = useState(1)
   const [showTimestamp, setShowTimestamp] = useState(true)
   const currentPhoto = photos[current]
   const currentRotation = rotations[photos[current]] || 0
 
-  const rotateCurrent = (degrees: number) => {
+  const rotateCurrent = (degrees: 90 | -90) => {
     const rotation = (currentRotation + degrees) % 360
     rotatePhoto(currentPhoto, rotation)
     setRotations({ ...rotations, [currentPhoto]: rotation })
@@ -88,9 +89,28 @@ export function App({ photos: initialPhotos }: { photos: number[] }) {
   }
 
   return (
-    <div id="app" tabIndex={-1} class="App App-container" onKeyDown={handleKeyDown}>
-      {current >= 0 && <Photo src={photoUrl(currentPhoto)} rotation={currentRotation} />}
-      {current >= 0 && showTimestamp && <Timestamp timestamp={currentPhoto} />}
+    <div
+      id="app"
+      tabIndex={-1}
+      class="App App-container"
+      onKeyDown={handleKeyDown}
+      onWheel={(e) => {
+        if (e.ctrlKey) return
+
+        // TODO: use current mouse position as origin for scaling
+        // console.log(e.x, e.y)
+        // probably it would be good to have a 'transform' property,
+        // where we can set all transformations at once
+        // rotation/mirroring scale around origin, etc
+        // origins could be changed if mouse cursor changes
+        // also panning of a zoomed image might be good
+        // TODO: investigate https://github.com/anvaka/panzoom
+
+        setScale(Math.max(1, scale * (e.deltaY > 0 ? 0.85 : 1.15)))
+      }}
+    >
+      <Photo src={photoUrl(currentPhoto)} rotation={currentRotation} scale={scale} />
+      {showTimestamp && <Timestamp timestamp={currentPhoto} />}
     </div>
   )
 }
