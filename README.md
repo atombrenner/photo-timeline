@@ -97,6 +97,24 @@ Commands are little scripts in the bin folder which can be quickly called with
 
 Configuration is stored in [`config.ts`](lib/config.ts).
 
+## Web App
+
+The web app is a simple photo viewer.
+It needs a local server at localhost:9000 that serves the app files, photos,
+and handles some commands like delete.
+
+Create a `.desktop` file for the Linux desktop integration
+`~/.local/share/applications/photo-timeline.desktop`:
+
+```
+[Desktop Entry]
+Name=Photo Timeline
+Exec=/home/christian/Data/MyMedia/photo-timeline/start.sh
+Icon=/home/christian/Data/MyMedia/photo-timeline/photo.png
+Type=Application
+Categories=Utility
+```
+
 ## Implementation Details
 
 - if we need to use `fs-extra` for high-level file operations, e.g. moving files

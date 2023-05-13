@@ -19,7 +19,7 @@
     "build:server": "esbuild --bundle --minify --keep-names --target=node18 --platform=node --outfile=./server/build/server.js server/index.ts",
     "--bundle--": "",
     "deploy:clean": "rm -rf \"$MY_MEDIA/photo-timeline/\"",
-    "deploy:webapp": "cp -r ./webapp/dist \"$MY_MEDIA/photo-timeline/\"",
+    "deploy:webapp": "cp -r ./webapp/dist \"$MY_MEDIA/photo-timeline\"",
     "deploy:server": "cp ./server/build/server.js \"$MY_MEDIA/photo-timeline/\"",
     "deploy": "[[ \"$MY_MEDIA\" ]] && npm run build && npm run deploy:clean && npm run deploy:webapp && npm run deploy:server || echo '$MY_MEDIA not defined'"
   },
