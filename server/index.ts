@@ -34,8 +34,8 @@ app.use(async (ctx, next) => {
 app.use(serveStatic(photoRootPath, { maxAge: 5 * 60 * 1000 }))
 app.use(serveStatic(join(mediaRootPath, 'photo-timeline')))
 app.onerror = (err: Error) => {
-  // ignore ECONNRESET errors that happen if browser cancels download, e.g. when skipping fast through photos
-  if (!err.message.includes('ECONNRESET')) console.error(err)
+  // ignore ECONNRESET and ECONNABORTED errors that happen if browser cancels download, e.g. when skipping fast through photos
+  if (!err.message.match(/ECONNRESET|ECONNABORTED/)) console.error(err)
 }
 app.listen(9000)
 
