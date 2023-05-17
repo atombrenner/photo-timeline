@@ -54,62 +54,65 @@ describe('organizeByTimestamp', () => {
 })
 
 describe('calcMoveFileOps', () => {
-  const pathFromTimestamp = (timestamp: number) => timestamp.toFixed(2)
+  const makeFilePath = (timestamp: number) => `/path/${timestamp.toFixed(2)}`
 
   it('should do nothing if current path equals desired path', () => {
-    const files = [{ path: '1.00', timestamp: 1 }]
-    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    const files = [
+      { path: '/path/1.00', timestamp: 1 },
+      { path: 2, timestamp: 2 },
+    ]
+    const { renameOps, moveOps } = calcMoveFileOps(files, makeFilePath)
     expect(renameOps).toHaveLength(0)
     expect(moveOps).toHaveLength(0)
   })
 
   it('should create moveOps if path does not match path calculated from timestamp', () => {
     const files = [
-      { path: '1.00', timestamp: 1.01 },
-      { path: '2.00', timestamp: 2.01 },
+      { path: '/path/1.00', timestamp: 1.01 },
+      { path: 2.0, timestamp: 2.01 },
     ]
-    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    const { renameOps, moveOps } = calcMoveFileOps(files, makeFilePath)
     expect(renameOps).toHaveLength(0)
     expect(moveOps).toEqual([
-      { from: '1.00', to: '1.01' },
-      { from: '2.00', to: '2.01' },
+      { from: '/path/1.00', to: '/path/1.01' },
+      { from: '/path/2.00', to: '/path/2.01' },
     ])
   })
 
   it('should create renameOps if files are renamed to existing files', () => {
     const files = [
       { path: 'new.jpg', timestamp: 1.01 },
-      { path: '1.01', timestamp: 1.02 },
-      { path: '1.02', timestamp: 1.03 },
+      { path: 1.01, timestamp: 1.02 },
+      { path: 1.02, timestamp: 1.03 },
     ]
-    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    const { renameOps, moveOps } = calcMoveFileOps(files, makeFilePath)
     expect(renameOps).toEqual([
-      { from: '1.01', to: '__1.01' },
-      { from: '1.02', to: '__1.02' },
+      { from: '/path/1.01', to: '/path/1.01_' },
+      { from: '/path/1.02', to: '/path/1.02_' },
     ])
     expect(moveOps).toEqual([
-      { from: 'new.jpg', to: '1.01' },
-      { from: '__1.01', to: '1.02' },
-      { from: '__1.02', to: '1.03' },
+      { from: 'new.jpg', to: '/path/1.01' },
+      { from: '/path/1.01_', to: '/path/1.02' },
+      { from: '/path/1.02_', to: '/path/1.03' },
     ])
   })
 
   it('should create valid ops for cyclic renamed files', () => {
     const files = [
-      { path: '1.00', timestamp: 1.01 },
-      { path: '1.01', timestamp: 1.02 },
-      { path: '1.02', timestamp: 1.0 },
+      { path: 1.0, timestamp: 1.01 },
+      { path: 1.01, timestamp: 1.02 },
+      { path: 1.02, timestamp: 1.0 },
     ]
-    const { renameOps, moveOps } = calcMoveFileOps(files, pathFromTimestamp)
+    const { renameOps, moveOps } = calcMoveFileOps(files, makeFilePath)
     expect(renameOps).toEqual([
-      { from: '1.00', to: '__1.00' },
-      { from: '1.01', to: '__1.01' },
-      { from: '1.02', to: '__1.02' },
+      { from: '/path/1.00', to: '/path/1.00_' },
+      { from: '/path/1.01', to: '/path/1.01_' },
+      { from: '/path/1.02', to: '/path/1.02_' },
     ])
     expect(moveOps).toEqual([
-      { from: '__1.00', to: '1.01' },
-      { from: '__1.01', to: '1.02' },
-      { from: '__1.02', to: '1.00' },
+      { from: '/path/1.00_', to: '/path/1.01' },
+      { from: '/path/1.01_', to: '/path/1.02' },
+      { from: '/path/1.02_', to: '/path/1.00' },
     ])
   })
 })

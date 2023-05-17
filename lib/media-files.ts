@@ -2,11 +2,7 @@ import parseExif from 'exif-reader'
 import sharp from 'sharp'
 import { ffprobe } from './ffprobe'
 import { listFiles } from './filesystem'
-
-export type MediaFile = {
-  path: string
-  timestamp: number
-}
+import { MediaFile } from './media-file'
 
 export type ReadMediaFiles = (folder: string) => Promise<MediaFile[]>
 

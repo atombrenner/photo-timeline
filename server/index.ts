@@ -4,7 +4,7 @@ import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import serveStatic from 'koa-static'
 import { mediaRootPath, photoRootPath } from 'lib/config'
-import { makePhotoPathName } from 'lib/names'
+import { makePhotoFilePath } from 'lib/names'
 import { basename, join } from 'path'
 
 const deletedPhotos = join(photoRootPath, '_deleted_')
@@ -19,7 +19,7 @@ app.use(async (ctx, next) => {
   if (isNaN(timestamp)) {
     await next()
   } else {
-    ctx.path = makePhotoPathName(timestamp)
+    ctx.path = makePhotoFilePath(timestamp)
     if (ctx.method === 'DELETE') {
       deletePhoto(ctx.path, timestamp)
       ctx.body = 'OK'

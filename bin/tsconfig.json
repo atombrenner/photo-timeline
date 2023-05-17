@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
+    "types": ["lib/exif-reader.d.ts"],
     "outDir": "build",
     "declaration": false,
     "sourceMap": true,

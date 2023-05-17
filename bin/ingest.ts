@@ -3,11 +3,12 @@
 import { ingestSources, mediaRootPath } from 'lib/config'
 import { removeEmptyFolders } from 'lib/filesystem'
 import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from 'lib/media-files'
-import { MakePathName, makePhotoPathName, makeVideoPathName } from 'lib/names'
-import { organize, readIndex } from 'lib/organize'
+import { MakeMediaFilePath, makePhotoFilePath, makeVideoFilePath } from 'lib/names'
+import { organize } from 'lib/organize'
 import { join } from 'node:path'
 import { existsSync, mkdirSync } from 'node:fs'
 import { parseArgv } from 'lib/args'
+import { readIndex, writeIndex } from 'lib/media-index'
 
 async function main() {
   const { args, photos, videos, help } = parseArgv(process.argv)
@@ -36,12 +37,12 @@ async function main() {
 
   if (photos) {
     const photoRootPath = join(rootPath, 'Photos')
-    await ingest(photoRootPath, source, readPhotoFiles, makePhotoPathName)
+    await ingest(photoRootPath, source, readPhotoFiles, makePhotoFilePath)
   }
 
   if (videos) {
     const videoRootPath = join(rootPath, 'Videos')
-    await ingest(videoRootPath, source, readVideoFiles, makeVideoPathName)
+    await ingest(videoRootPath, source, readVideoFiles, makeVideoFilePath)
   }
 
   // clean source
@@ -55,17 +56,15 @@ const ingest = async (
   rootPath: string,
   source: string,
   readFiles: ReadMediaFiles,
-  makePathName: MakePathName,
+  makeFilePath: MakeMediaFilePath,
 ) => {
   if (!existsSync(rootPath)) {
     mkdirSync(rootPath)
+    await writeIndex(rootPath, [])
   }
-  const [indexFiles, sourceFiles] = await Promise.all([
-    readIndex(rootPath, makePathName),
-    readFiles(source),
-  ])
-  const files = indexFiles.concat(sourceFiles)
-  await organize(files, rootPath, makePathName)
+  const [fromIndex, fromSource] = await Promise.all([readIndex(rootPath), readFiles(source)])
+  const files = fromIndex.concat(fromSource)
+  await organize(files, rootPath, makeFilePath)
 }
 
 main().catch((err) => {

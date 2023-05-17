@@ -10,7 +10,7 @@
   "scripts": {
     "start": "cd webapp && vite",
     "build:webapp": "cd webapp && vite build",
-    "tsc": "tsc --build lib server && tsc -p webapp",
+    "tsc": "tsc --build lib server bin && tsc -p webapp",
     "build": "rm -rf build && npm run build:webapp && npm run build:server",
     "test": "vitest --dir webapp/src --globals",
     "test:ci": "npm -w lib run test:ci && vitest --run --dir webapp --globals --reporter basic --reporter junit --outputFile webapp/junit.xml",

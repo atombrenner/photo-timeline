@@ -1,47 +1,35 @@
-import { readJSONSync, removeSync, writeJSONSync } from 'fs-extra'
 import { join } from 'node:path'
 import { FromTo, moveFile, renameFile } from './filesystem'
-import { MediaFile } from './media-files'
-import { MakePathName } from './names'
-
-const getIndexFileName = (rootPath: string) => join(rootPath, 'index.json')
-
-export const readIndex = async (
-  rootPath: string,
-  makeRelativePathName: MakePathName,
-): Promise<MediaFile[]> => {
-  const makePathName = (timestamp: number) => join(rootPath, makeRelativePathName(timestamp))
-  const index = readJSONSync(getIndexFileName(rootPath))
-  for (let i = index.length; i-- > 0; ) {
-    const timestamp = index[i]
-    index[i] = { path: makePathName(timestamp), timestamp } satisfies MediaFile
-  }
-  return index
-}
+import { MediaFile } from './media-file'
+import { MakeMediaFilePath } from './names'
+import { removeIndex, writeIndex } from './media-index'
 
 export const organize = async (
   files: MediaFile[],
   rootPath: string,
-  makeRelativePathName: MakePathName,
+  makeFilePath: MakeMediaFilePath,
 ) => {
-  const makePathName = (timestamp: number) => join(rootPath, makeRelativePathName(timestamp))
-
   // sort files by timestamp and add sequence number as fraction (mutates files array)
   organizeByTimestamp(files)
-  const { renameOps, moveOps } = calcMoveFileOps(files, makePathName)
 
-  // remove index, so we don't have inconsistent data during file movements
-  const indexFileName = getIndexFileName(rootPath)
-  removeSync(indexFileName)
+  // calculate which files to move
+  const makeAbsoluteFilePath = (timestamp: number) => join(rootPath, makeFilePath(timestamp))
+  const { renameOps, moveOps } = calcMoveFileOps(files, makeAbsoluteFilePath)
+
+  // Before we start moving files around, we *must* remove the index file.
+  // Otherwise, if anything goes wrong during file movement, the index file
+  // would be inconsistent with the file structure, and the next ingest
+  // operation could potentially loose media files.
+  await removeIndex(rootPath)
+
   // rename conflicting files before moving
   await Promise.all(renameOps.map(renameFile))
-  // files must not be moved until conflicting files are renamed
+
+  // files must not be moved until all conflicting files are renamed
   await Promise.all(moveOps.map(moveFile))
 
-  // as a last step, write the new index
-  const index = files.map(({ timestamp }) => timestamp)
-  writeJSONSync(indexFileName, index)
-  console.log(`wrote ${index.length} entries to ${indexFileName}`)
+  // write new index file
+  await writeIndex(rootPath, files)
 }
 
 // sorts an array of items by its timestamp property
@@ -77,13 +65,18 @@ export const organizeByTimestamp = (items: MediaFile[]): void => {
 
 export const toSeconds = (timestamp: number) => Math.trunc(timestamp / 1000)
 
-export const calcMoveFileOps = (files: MediaFile[], makePathName: MakePathName) => {
+export const calcMoveFileOps = (files: MediaFile[], makeFilePath: MakeMediaFilePath) => {
   const targets = new Set<string>()
-
   const moveOps: FromTo[] = []
+
   for (const file of files) {
-    const path = makePathName(file.timestamp)
-    if (path !== file.path) {
+    if (file.path === file.timestamp) continue
+
+    if (typeof file.path === 'number') {
+      file.path = makeFilePath(file.path)
+    }
+    const path = makeFilePath(file.timestamp)
+    if (file.path !== path) {
       moveOps.push({ from: file.path, to: path })
       targets.add(path)
     }
@@ -93,7 +86,7 @@ export const calcMoveFileOps = (files: MediaFile[], makePathName: MakePathName) 
   const renameOps: FromTo[] = []
   for (const move of moveOps) {
     if (targets.has(move.from)) {
-      const tmpPath = '__' + move.from
+      const tmpPath = move.from + '_'
       renameOps.push({ from: move.from, to: tmpPath })
       move.from = tmpPath
     }

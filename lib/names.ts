@@ -4,16 +4,16 @@ import { join } from 'node:path'
 
 const localized = { locale: enUS }
 
-export type MakePathName = (timestamp: number) => string
+export type MakeMediaFilePath = (timestamp: number) => string
 
-export const makePhotoPathName = (timestamp: number) =>
+export const makePhotoFilePath = (timestamp: number) =>
   join(makePhotoFolderName(timestamp), makeFileName(timestamp, '.jpg'))
+
+export const makeVideoFilePath = (timestamp: number) =>
+  join(makeVideoFolderName(timestamp), makeFileName(timestamp, '.mp4'))
 
 export const makePhotoFolderName = (timestamp: number) =>
   format(timestamp, 'yyyy/MM-MMMM', localized)
-
-export const makeVideoPathName = (timestamp: number) =>
-  join(makeVideoFolderName(timestamp), makeFileName(timestamp, '.mp4'))
 
 export const makeVideoFolderName = (timestamp: number) => format(timestamp, 'yyyy')
 

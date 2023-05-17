@@ -4,7 +4,7 @@ import { parseArgv } from 'lib/args'
 import { mediaRootPath } from 'lib/config'
 import { removeEmptyFolders } from 'lib/filesystem'
 import { ReadMediaFiles, readPhotoFiles, readVideoFiles } from 'lib/media-files'
-import { MakePathName, makePhotoPathName, makeVideoPathName } from 'lib/names'
+import { MakeMediaFilePath, makePhotoFilePath, makeVideoFilePath } from 'lib/names'
 import { organize } from 'lib/organize'
 import { existsSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
@@ -24,21 +24,25 @@ async function main() {
 
   if (photos) {
     const photoRootPath = join(rootPath, 'Photos')
-    await reindex(photoRootPath, readPhotoFiles, makePhotoPathName)
+    await reindex(photoRootPath, readPhotoFiles, makePhotoFilePath)
   }
 
   if (videos) {
     const videoRootPath = join(rootPath, 'Videos')
-    await reindex(videoRootPath, readVideoFiles, makeVideoPathName)
+    await reindex(videoRootPath, readVideoFiles, makeVideoFilePath)
   }
 }
 
-const reindex = async (rootPath: string, readFiles: ReadMediaFiles, makePathName: MakePathName) => {
+const reindex = async (
+  rootPath: string,
+  readFiles: ReadMediaFiles,
+  makeFilePath: MakeMediaFilePath,
+) => {
   if (!existsSync(rootPath)) {
     mkdirSync(rootPath)
   }
   const files = await readFiles(rootPath)
-  await organize(files, rootPath, makePathName)
+  await organize(files, rootPath, makeFilePath)
   await removeEmptyFolders(rootPath)
 }
 

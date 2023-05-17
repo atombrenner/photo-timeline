@@ -2,8 +2,8 @@
   "name": "lib",
   "version": "1.0.0",
   "scripts": {
-    "test": "vitest --globals --root=..",
-    "test:ci": "vitest --run --globals --root=.. --reporter basic --reporter junit --outputFile junit.xml",
+    "test": "vitest --globals",
+    "test:ci": "vitest --run --globals --reporter basic --reporter junit --outputFile junit.xml",
     "ffprobe": "ts-node -T ffprobe.ts"
   },
   "author": "Christian Rodemeyer",
