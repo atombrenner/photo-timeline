@@ -21,7 +21,7 @@ async function main() {
     throw Error('missing ingest source argument')
   }
 
-  const source = getIngestSource(args[0].toLowerCase())
+  const source = getIngestSource(args[0])
   if (!existsSync(source)) {
     throw Error(
       `source '${source}' does not exist, configured sources are:\n- ${Object.keys(
@@ -49,8 +49,12 @@ async function main() {
   await removeEmptyFolders(source)
 }
 
-const getIngestSource = (arg: string) =>
-  arg in ingestSources ? ingestSources[arg as keyof typeof ingestSources] : arg
+const getIngestSource = (arg: string) => {
+  const maybeSource = arg.toLowerCase()
+  return maybeSource in ingestSources
+    ? ingestSources[maybeSource as keyof typeof ingestSources]
+    : arg
+}
 
 const ingest = async (
   rootPath: string,
