@@ -1,8 +1,13 @@
-import { readJSON, move, writeJSON } from 'fs-extra'
+import { readJSON, move, writeJSON, existsSync } from 'fs-extra'
 import { join } from 'node:path'
 import { MediaFile } from './media-file'
 
 export const readIndex = async (rootPath: string): Promise<MediaFile[]> => {
+  const indexPath = getIndexFilePath(rootPath)
+
+  if (!existsSync(indexPath))
+    throw Error(`index ${indexPath} not found, use 'npx reindex' to create/repair it`)
+
   const index = await readJSON(getIndexFilePath(rootPath))
   for (let i = index.length; i-- > 0; ) {
     const timestamp = index[i]
