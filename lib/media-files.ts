@@ -34,9 +34,9 @@ export const readPhotoTimestamp: ReadTimestamp = async (file) => {
   if (!metadata.exif) throw Error(`no exif metadata in ${file}`)
   const parsed = parseExif(metadata.exif)
   const ms = Number('0.' + (parsed.exif?.SubSecTimeOriginal || '0')) * 1000
-  const timestamp = Number(parsed.exif?.DateTimeOriginal || parsed.image?.ModifyDate || 0) + ms
-  if (timestamp < 1) throw Error('cannot read photo timestamp for ' + file)
-  return Math.trunc(timestamp)
+  const parsedTime = (parsed.exif?.DateTimeOriginal ?? parsed.image?.ModifyDate)?.getTime()
+  if (!parsedTime) throw Error('cannot read photo timestamp for ' + file)
+  return Math.trunc(parsedTime + ms)
 }
 
 export const readVideoTimestamp: ReadTimestamp = async (file) => {
