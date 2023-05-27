@@ -15,8 +15,8 @@ describe('readPhotoTimestamp', () => {
     expect(ts).toEqual(Date.parse('2000-01-02T03:04:05Z'))
   })
 
-  it('should use image ModifyDate if DateTimeOriginal is missing', async () => {
+  it('should throw if neither ModifyDate nor DateTimeOriginal can be found', async () => {
     const ts = readPhotoTimestamp(join(testData, 'no-dates.jpg'))
-    await expect(ts).rejects.toThrowError('no exif metadata')
+    await expect(ts).rejects.toThrowError('no photo timestamp')
   })
 })
