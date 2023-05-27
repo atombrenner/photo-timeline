@@ -9,7 +9,9 @@ const toSecond = (ts: number) => Math.trunc(ts / 1000)
 async function main() {
   // checkCreationDateUniqueness
   const photosPerSecond = new Map<number, number>()
+  console.time('readMetadata')
   const files = await readPhotoFiles(photoRootPath)
+  console.timeEnd('readMetadata')
 
   for (let i = 0; i < files.length; ++i) {
     const second = toSecond(files[i].timestamp)

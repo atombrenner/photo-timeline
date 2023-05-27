@@ -1,5 +1,4 @@
-import parseExif from 'exif-reader'
-import sharp from 'sharp'
+import { readExifData } from '@atombrenner/exif-reader-jpeg'
 import { ffprobe } from './ffprobe'
 import { listFiles } from './filesystem'
 import { MediaFile } from './media-file'
@@ -30,11 +29,9 @@ const readMediaFiles = async (
 }
 
 export const readPhotoTimestamp: ReadTimestamp = async (file) => {
-  const metadata = await sharp(file).metadata()
-  if (!metadata.exif) throw Error(`no exif metadata in ${file}`)
-  const parsed = parseExif(metadata.exif)
-  const ms = Number('0.' + (parsed.exif?.SubSecTimeOriginal || '0')) * 1000
-  const parsedTime = (parsed.exif?.DateTimeOriginal ?? parsed.image?.ModifyDate)?.getTime()
+  const metadata = await readExifData(file)
+  const ms = Number('0.' + (metadata.exif?.SubSecTimeOriginal || '0')) * 1000
+  const parsedTime = (metadata.exif?.DateTimeOriginal ?? metadata.image?.ModifyDate)?.getTime()
   if (!parsedTime) throw Error('cannot read photo timestamp for ' + file)
   return Math.trunc(parsedTime + ms)
 }
