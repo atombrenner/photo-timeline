@@ -9,7 +9,7 @@
   "author": "Christian Rodemeyer",
   "license": "ISC",
   "dependencies": {
-    "exif-reader": "^1.2.0",
+    "@atombrenner/exif-reader-jpeg": "^2.0.0-rc.1",
     "sharp": "^0.32.0"
   },
   "devDependencies": {

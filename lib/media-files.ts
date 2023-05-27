@@ -29,9 +29,9 @@ const readMediaFiles = async (
 }
 
 export const readPhotoTimestamp: ReadTimestamp = async (file) => {
-  const metadata = await readExifData(file)
-  const ms = Number('0.' + (metadata.exif?.SubSecTimeOriginal || '0')) * 1000
-  const parsedTime = (metadata.exif?.DateTimeOriginal ?? metadata.image?.ModifyDate)?.getTime()
+  const exif = await readExifData(file)
+  const ms = Number('0.' + (exif.Photo?.SubSecTimeOriginal || '0')) * 1000
+  const parsedTime = (exif.Photo?.DateTimeOriginal ?? exif.Image?.DateTime)?.getTime()
   if (!parsedTime) throw Error('no photo timestamp in ' + file)
   return Math.trunc(parsedTime + ms)
 }
