@@ -94,20 +94,20 @@ export const App = ({ photos: initialPhotos }: { photos: number[] }) => {
       tabIndex={-1}
       class="App App-container"
       onKeyDown={handleKeyDown}
-      onWheel={(e) => {
-        if (e.ctrlKey) return
+      // onWheel={(e) => {
+      //   if (e.ctrlKey) return
 
-        // TODO: use current mouse position as origin for scaling
-        // console.log(e.x, e.y)
-        // probably it would be good to have a 'transform' property,
-        // where we can set all transformations at once
-        // rotation/mirroring scale around origin, etc
-        // origins could be changed if mouse cursor changes
-        // also panning of a zoomed image might be good
-        // TODO: investigate https://github.com/anvaka/panzoom
+      //   // TODO: use current mouse position as origin for scaling
+      //   // console.log(e.x, e.y)
+      //   // probably it would be good to have a 'transform' property,
+      //   // where we can set all transformations at once
+      //   // rotation/mirroring scale around origin, etc
+      //   // origins could be changed if mouse cursor changes
+      //   // also panning of a zoomed image might be good
+      //   // TODO: investigate https://github.com/anvaka/panzoom
 
-        setScale(Math.max(1, scale * (e.deltaY > 0 ? 0.85 : 1.15)))
-      }}
+      //   setScale(Math.max(1, scale * (e.deltaY > 0 ? 0.85 : 1.15)))
+      // }}
     >
       <Photo src={photoUrl(currentPhoto)} rotation={currentRotation} scale={scale} />
       {showTimestamp && <Timestamp timestamp={currentPhoto} />}

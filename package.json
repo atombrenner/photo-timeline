@@ -32,6 +32,7 @@
     "koa-bodyparser": "^4.3.0",
     "koa-cors": "^0.0.16",
     "koa-static": "^5.0.0",
+    "panzoom": "^9.4.3",
     "preact": "^10.14.0"
   },
   "devDependencies": {
