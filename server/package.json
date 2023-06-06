@@ -2,9 +2,9 @@
   "name": "server",
   "description": "serve photos and manipulate index",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "start": "ts-node-dev -T index.ts",
+    "prebuild": "rm -rf build",
     "build": "esbuild --bundle --minify --keep-names --target=node20 --platform=node --outfile=./build/server.js index.ts"
   },
   "dependencies": {

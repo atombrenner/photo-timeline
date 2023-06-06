@@ -1,0 +1,19 @@
+{
+  "name": "webapp",
+  "description": "view photos ordered by time",
+  "scripts": {
+    "start": "vite",
+    "test": "vitest src --globals",
+    "test:ci": "vitest --run --globals --reporter basic --reporter junit --outputFile junit.xml",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "panzoom": "^9.4.3",
+    "preact": "^10.14.0",
+    "@preact/signals": "^1.1.3"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "@testing-library/preact": "^3.2.3"
+  }
+}
