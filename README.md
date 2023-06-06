@@ -100,8 +100,8 @@ Configuration is stored in [`config.ts`](lib/config.ts).
 ## Web App
 
 The web app is a simple photo viewer.
-It needs a local server at localhost:9000 that serves the app files, photos,
-and handles some commands like delete.
+It needs a local server at localhost:9000 for serving photos and
+handling some commands like delete and rotate.
 
 Create a `.desktop` file for the Linux desktop integration
 `~/.local/share/applications/photo-timeline.desktop`:
@@ -119,8 +119,8 @@ Categories=Utility
 
 - if we need to use `fs-extra` for high-level file operations, e.g. moving files
   across file systems, we can also use the more convenient wrapper functions
-- at least on unix, it seems to be fine to have thousands of move
-  operations running in parallel with Promise.all(), so no limits are implemented
+- at least on unix, it seems to be fine to have tens of thousands of move
+  operations running in parallel with `Promise.all()`, so no limits are implemented
 
 ### Timestamp based index and filename generation
 
@@ -174,7 +174,7 @@ Build and copy the app to ~/Data/MyMedia
 
 ## Video Metadata
 
-It's a messs,`ffmpeg -dump` can help,
+It's a mess,`ffmpeg` -dump` can help,
 
 But the best way is to pick the date from mtime (modified) and encode it in the file name
 =>2020-01-01_12-59-03_001.mp4
@@ -184,7 +184,7 @@ ffprobe works for newer formats reliable
 
 ## Recursively remove executable flag
 
-Sometimes media files are executable, possible because of windows filesystems.
+Sometimes media files are executable, possibly because of Windows filesystems.
 Use this command to recursively remove the executable flag from all files (and not folders)
 
 ```bash
@@ -209,4 +209,4 @@ The `-metadata creation_time=2019-01-01T12:00:00` can set the time to the genera
 
 quality of 80 saves between 50% and 90% but images have visible differences
 quality of 90 saves between 25% and 80% but images have still visible differences
-compression is very cpu intensive, one image takes 1 to 3 seconds, 4 cores are utilized at 100%
+compression is very CPU intensive, one image takes 1 to 3 seconds, 4 cores are utilized at 100%
