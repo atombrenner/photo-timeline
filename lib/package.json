@@ -6,10 +6,7 @@
     "ffprobe": "ts-node -T ffprobe.ts"
   },
   "dependencies": {
-    "@atombrenner/exif-reader-jpeg": "^2.0.0-rc.1",
-    "sharp": "^0.32.0"
+    "@atombrenner/exif-reader-jpeg": "^2.0.0-rc.1"
   },
-  "devDependencies": {
-    "@types/sharp": "^0.32.0"
-  }
+  "devDependencies": {}
 }

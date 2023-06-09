@@ -9,7 +9,7 @@
     "stats": "./bin/stats.ts"
   },
   "scripts": {
-    "start": "npm -w server start & && npm -w webapp start",
+    "start": "npm -w server start & npm -w webapp start",
     "tsc": "npx -ws tsc && tsc -p bin",
     "build": "npm -ws run build --if-present",
     "test": "npm -ws run test --if-present -- --run",

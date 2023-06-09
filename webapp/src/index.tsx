@@ -5,5 +5,4 @@ import './index.css'
 
 loadPhotos().then((photos) => {
   render(<App photos={photos} />, document.getElementById('root') as HTMLElement)
-  document.getElementById('app')?.focus()
 })
