@@ -17,11 +17,7 @@ async function main() {
     return
   }
 
-  if (args.length === 0) {
-    throw Error('missing ingest source argument')
-  }
-
-  const source = getIngestSource(args[0])
+  const source = getIngestSource(args[0] ?? '')
   if (!existsSync(source)) {
     throw Error(
       `source '${source}' does not exist, configured sources are:\n- ${Object.keys(
