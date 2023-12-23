@@ -1,6 +1,7 @@
 {
   "name": "webapp",
   "description": "view photos ordered by time",
+  "type": "module",
   "scripts": {
     "start": "vite",
     "test": "vitest src --globals",

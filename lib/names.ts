@@ -1,4 +1,4 @@
-import format from 'date-fns/format'
+import { format } from 'date-fns/format'
 import { enUS } from 'date-fns/locale'
 import { join } from 'node:path'
 

@@ -1,5 +1,5 @@
 import './timestamp.css'
-import format from 'date-fns/format'
+import { format } from 'date-fns/format'
 
 export type TimestampProps = {
   timestamp: number

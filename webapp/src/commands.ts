@@ -1,4 +1,4 @@
-import add from 'date-fns/add'
+import { Duration, add } from 'date-fns'
 
 export type NavigationCommand = (photos: number[], current: number) => number
 
