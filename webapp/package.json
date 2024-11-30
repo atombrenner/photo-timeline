@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "test": "vitest src --globals",
+    "test": "vitest src --globals --reporter verbose",
     "test:ci": "vitest --run --globals --reporter basic --reporter junit --outputFile junit.xml",
     "build": "vite build"
   },

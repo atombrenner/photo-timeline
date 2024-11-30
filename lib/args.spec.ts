@@ -20,7 +20,7 @@ describe('parseArgv', () => {
     ['--videos', false],
     ['--photos --videos', true],
     ['--photos', true],
-  ])('%p should set photos option to %p', (args, expected) => {
+  ])('"%s" should set photos option to %s', (args, expected) => {
     const { photos } = parseArgv([...argv, ...args.split(' ')])
     expect(photos).toBe(expected)
   })
@@ -30,7 +30,7 @@ describe('parseArgv', () => {
     ['--photos', false],
     ['--photos --videos', true],
     ['--videos', true],
-  ])('%p should set videos option to %p', (args, expected) => {
+  ])('"%s" should set videos option to %s', (args, expected) => {
     const { videos } = parseArgv([...argv, ...args.split(' ')])
     expect(videos).toBe(expected)
   })
@@ -39,7 +39,7 @@ describe('parseArgv', () => {
     ['help', true],
     ['--help', true],
     ['', false],
-  ])('%p should set help option to %p', (args, expected) => {
+  ])('"%s" should set help option to %s', (args, expected) => {
     const { help } = parseArgv([...argv, ...args.split(' ')])
     expect(help).toBe(expected)
   })

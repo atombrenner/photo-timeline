@@ -1,7 +1,7 @@
 {
   "name": "lib",
   "scripts": {
-    "test": "vitest --globals",
+    "test": "vitest --globals --reporter verbose",
     "test:ci": "vitest --run --globals --reporter basic --reporter junit --outputFile junit.xml",
     "ffprobe": "ts-node -T ffprobe.ts"
   },
