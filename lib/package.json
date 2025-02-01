@@ -6,7 +6,11 @@
     "ffprobe": "ts-node -T ffprobe.ts"
   },
   "dependencies": {
-    "@atombrenner/exif-reader-jpeg": "^2.0.0"
+    "@atombrenner/exif-reader-jpeg": "^2.0.0",
+    "date-fns": "^3.0.6",
+    "fs-extra": "^11.1.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.1"
+  }
 }
