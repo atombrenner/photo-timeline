@@ -15,5 +15,5 @@ export const videoRootPath = join(mediaRootPath, 'Videos')
 export const ingestSources = {
   camera: '/run/media/christian/9016-4EF8/DCIM/',
   pixel:
-    '/run/user/1000/gvfs/mtp:host=Google_Pixel_4a__5G__0B161JECB14146/Interner gemeinsamer Speicher/DCIM/Camera',
+    '/run/user/1000/gvfs/mtp:host=Google_Pixel_8a_51151JEKB02090/Interner gemeinsamer Speicher/DCIM/Camera',
 }
