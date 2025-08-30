@@ -76,12 +76,10 @@ Commands are little scripts in the bin folder which can be quickly called with
 `npx <command>`.
 
 - `npx ingest <source> [media]` moves files from a source to the media folder
-
   - `source` is a [preconfigured source](lib/config.ts) or a folder path
   - if present, `media` overrides the configured media folder
 
 - `npx reindex [media]` reindex (reorganize) existing files in the media folder
-
   - if present, `media` overrides the configured media folder
 
 - `npx stats [media]` experimental analytics of files in the media folder
@@ -148,7 +146,7 @@ Categories=Utility
 
 ## Setup
 
-- install node > 18
+- install node
 - git clone this repository
 - run `npm i` to install dependencies
 

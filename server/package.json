@@ -5,7 +5,7 @@
     "tsc": "tsc",
     "start": "ts-node-dev -T index.ts",
     "prebuild": "rm -rf build",
-    "build": "esbuild --bundle --minify --keep-names --target=node22 --platform=node --outfile=./build/server.js index.ts"
+    "build": "esbuild --bundle --minify --keep-names --target=node24 --platform=node --outfile=./build/server.js index.ts"
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",
